@@ -13,7 +13,6 @@ import java.net.URI;
 @Slf4j
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class UserController {
     private UserService userService;
 
