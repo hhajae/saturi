@@ -14,6 +14,7 @@ public class SocialAuthResponse {
     private String refreshToken;
     private String expiresIn;
     private String refreshTokenExpiresIn;
+    private String idToken;
     private String tokenType;
     private String scope;
 }
