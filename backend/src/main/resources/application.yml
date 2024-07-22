@@ -17,3 +17,11 @@ spring:
   # 선택사항: Hibernate 통계 정보 활성화
   # hibernate:
   #   generate_statistics: true
+
+# 로그 설정
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type: trace
