@@ -13,13 +13,13 @@ import org.springframework.data.redis.core.RedisHash;
 public class Token {
 
     @Id
-    private Long user_id;//user_id로 할 것인지는 아직 결정안함
+    private Long userId;
     private String refreshToken;
 
     @Override
     public String toString() {
         return "Token{" +
-                "user_id=" + user_id +
+                "user_id=" + userId +
                 ", refreshToken='" + refreshToken + '\'' +
                 '}';
     }
