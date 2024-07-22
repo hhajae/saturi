@@ -1,7 +1,7 @@
 export default function App() {
   return (
     <div>
-      hello World!
+      메인 페이지
     </div>
   )
 }
