@@ -3,10 +3,12 @@ package com.tunapearl.saturi.service;
 import com.tunapearl.saturi.dto.SocialAuthResponse;
 import com.tunapearl.saturi.dto.SocialUserResponse;
 import com.tunapearl.saturi.dto.UserType;
+import com.tunapearl.saturi.exception.InvalidTokenException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.json.GsonJsonParser;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -74,13 +76,39 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
         return response.getBody();
     }
 
-    public void checkTokenValidity(String accessToken) {
+    public void checkTokenValidity(String accessToken) throws InvalidTokenException, RuntimeException{
         String url = "https://kapi.kakao.com/v1/user/access_token_info";
 
         //헤더 셋팅
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
 
+        //토큰 검증 요청
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                requestEntity,
+                String.class
+        );
+
+        if(response.getStatusCode() == HttpStatus.OK) {
+            log.info("Kakao Access Token Validity OK: {}", response.getBody());
+            return;
+        }
+        else{
+            GsonJsonParser parser = new GsonJsonParser();
+            Map<String, Object> map = parser.parseMap(response.getBody());
+            int code = (int) map.get("code");
+            String msg = (String) map.get("msg");
+
+            if(code == -401){
+                throw new InvalidTokenException(msg, accessToken);
+            }
+            else{
+                throw new RuntimeException(msg);
+            }
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.tunapearl.saturi.service;
 
 import com.tunapearl.saturi.domain.UserEntity;
 import com.tunapearl.saturi.dto.*;
+import com.tunapearl.saturi.exception.InvalidTokenException;
 import com.tunapearl.saturi.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -47,9 +48,15 @@ public class UserService {
         SocialAuthResponse authResponse = loginService.getAccessToken(request.getCode());
 
         // 토큰 유효성 검사
-
-        checkTokenPayload(authResponse.getIdToken());
-        checkTokenSignature(authResponse.getIdToken());
+        try {
+            ((KakaoLoginServiceImpl) loginService).checkTokenValidity(authResponse.getAccessToken());
+        }
+        catch (InvalidTokenException e) {
+            e.getStackTrace();
+        }
+        catch (RuntimeException e) {
+            e.getStackTrace();
+        }
 
         // 유저 개인 정보 얻기
         SocialUserResponse userResponse = loginService.getUserInfo(authResponse.getAccessToken());
