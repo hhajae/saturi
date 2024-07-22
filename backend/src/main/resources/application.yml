@@ -34,6 +34,15 @@ spring:
   # hibernate:
   #   generate_statistics: true
 
+  jwt:
+    salt: "ssafy-screte-key-20240719-ssafy-screte-key-20240719-ssafy-screte-key-20240719"
+    access-token:
+      expiretime: 3600000
+      # expiretime: 20000
+    refresh-token:
+      expiretime: 2592000000
+      # expiretime: 40000
+
   data:
     redis:
       host: localhost
