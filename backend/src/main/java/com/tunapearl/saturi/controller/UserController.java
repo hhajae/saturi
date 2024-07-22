@@ -108,7 +108,7 @@ public class UserController {
         //FIXME exception 수정 필요, 반환 타입 수정 필요
         log.info("Received normal user email send request for {}", request.getEmail());
         try {
-            return ResponseEntity.ok().body(userService.joinEmail(request.getEmail()));
+            return ResponseEntity.ok().body(userService.setEmailSend(request.getEmail()));
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
@@ -121,7 +121,7 @@ public class UserController {
     public ResponseEntity<String> emailAuthCheck(@RequestBody @Valid EmailCheckDTO request){
         //FIXME exception 수정 필요, 반환 타입 수정 필요
         log.info("Received normal user email auth check request for {}", request.getEmail());
-        if(userService.CheckAuthNum(request.getEmail(),request.getAuthNum())) {
+        if(userService.checkAuthNum(request.getEmail(),request.getAuthNum())) {
             return ResponseEntity.ok().body("ok");
         }
         else{

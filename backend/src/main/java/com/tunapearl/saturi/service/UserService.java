@@ -10,6 +10,7 @@ import com.tunapearl.saturi.utils.RedisUtil;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -171,55 +173,49 @@ public class UserService {
      * 이메일 인증
      */
     public int makeRandomNumber() {
+        //FIXME 인증번호 폼 변경 필요? (ex -> 8z76wq)
         Random r = new Random();
-        String randomNumber = "";
+        StringBuilder randomNumber = new StringBuilder();
         for(int i = 0; i < 6; i++) {
-            randomNumber += Integer.toString(r.nextInt(10));
+            randomNumber.append(Integer.toString(r.nextInt(10)));
         }
-        return Integer.parseInt(randomNumber);
+        return Integer.parseInt(randomNumber.toString());
     }
 
-    public boolean CheckAuthNum(String email, String authNum) {
-        if(redisUtil.getData(authNum) == null){
-            return false;
-        }
-        else if(redisUtil.getData(authNum).equals(email)){
-            return true;
-        }
-        else{
-            return false;
-        }
+    public boolean checkAuthNum(String email, String authNum) {
+        String getAuthNum = redisUtil.getData(authNum);
+        if(getAuthNum == null) return false;
+        return getAuthNum.equals(email);
     }
 
-    public String joinEmail(String email) throws MessagingException {
+    public String setEmailSend(String email) throws MessagingException {
         int authNumber = makeRandomNumber();
-        String setFrom = "gkwo7108@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
-        String toMail = email;
+        String setFromEmail = "gkwo7108@gmail.com";
+        //FIXME 인증 보내는 내용 수정 필요(디자인)
         String title = "사투리는 서툴러유 인증번호";
         String content =
                 "사투리는 서툴러유를 방문해주셔서 감사합니다😊" +
                         "<br><br>" +
-                        "인증 번호는 " + authNumber + "입니다." +
+                        "인증 번호는 [ " + authNumber + " ] 입니다." +
                         "<br>" +
-                        "인증번호를 홈페이지 내에 입력해주세요";
-        mailSend(setFrom, toMail, title, content, authNumber);
+                        "인증번호를 홈페이지에서 입력해주세요";
+        emailSend(setFromEmail, email, title, content, authNumber);
         return Integer.toString(authNumber);
     }
 
-    public void mailSend(String setFrom, String toMail, String title, String content, int authNumber) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage(); //JavaMailSender 객체를 사용하여 MimeMessage 객체를 생성
+    public void emailSend(String setFromEmail, String setToEmail, String title, String content, int authNumber) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message,true,"utf-8");
-            // true를 전달하여 multipart 형식의 메시지를 지원하고, "utf-8"을 전달하여 문자 인코딩을 설정
-            helper.setFrom(setFrom); // 이메일의 발신자 주소 설정
-            helper.setTo(toMail); // 이메일의 수신자 주소 설정
-            helper.setSubject(title); // 이메일의 제목을 설정
+            helper.setFrom(setFromEmail);
+            helper.setTo(setToEmail);
+            helper.setSubject(title);
             helper.setText(content,true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            e.printStackTrace();
+            log.error("email send error", e);
         }
-        redisUtil.setDataExpire(Integer.toString(authNumber), toMail, 60*5L);
+        redisUtil.setDataExpire(Integer.toString(authNumber), setToEmail, 60*5L); // redis에 인증번호 저장("123456" : "email@email")
 
     }
 
