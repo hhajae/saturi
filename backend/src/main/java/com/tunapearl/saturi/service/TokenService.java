@@ -20,7 +20,7 @@ public class TokenService {
 
     private final TokenRepository tokenRepository;
 
-    public void saveRefreshToken(Token token) {
+    public void saveRefreshToken(Token token){
 
         Optional<Token> registeredUser = tokenRepository.findById(token.getUserId());
         if (registeredUser.isPresent()) {
