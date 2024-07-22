@@ -20,21 +20,18 @@ public class TokenService {
 
     private final TokenRepository tokenRepository;
 
-    public void saveRefreshToken(Token token) throws UserExistException {
+    public void saveRefreshToken(Token token) {
 
-        //tokenRepository.save(token);
-
-        Optional<Token> registeredUser = tokenRepository.findById(token.getUser_id());
+        Optional<Token> registeredUser = tokenRepository.findById(token.getUserId());
         if (registeredUser.isPresent()) {
-            throw new UserExistException("[" + token.getUser_id() + "] 등록된 사용자 입니다.");
+            throw new UserExistException("[" + token.getUserId() + "] 등록된 사용자 입니다.");
         }
 
         tokenRepository.save(token);
     }
 
     public String getRefreshToken(Long id) throws Exception {
-        
-        //refresh token return
+
         Optional<Token> tokenOptional = tokenRepository.findById(id);
 
         if (tokenOptional.isEmpty()) {
@@ -47,9 +44,12 @@ public class TokenService {
         }
     }
 
-    public void deleteRefreshToken(Long id) throws Exception {
+    public void deleteRefreshToken(Long id){
 
-        //refreshToken을 null로 변경
+        Optional<Token> registeredUser = tokenRepository.findById(id);
+        if (registeredUser.isPresent()) {
+            throw new UserExistException("[" + id + "] 등록된 사용자 입니다.");
+        }
         tokenRepository.deleteById(id);
     }
 

@@ -1,10 +1,13 @@
 package com.tunapearl.saturi.service;
 
+import com.tunapearl.saturi.domain.Token;
 import com.tunapearl.saturi.domain.user.*;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.DuplicatedUserEmailException;
 import com.tunapearl.saturi.exception.DuplicatedUserNicknameException;
+import com.tunapearl.saturi.exception.UnAuthorizedException;
 import com.tunapearl.saturi.repository.UserRepository;
+import com.tunapearl.saturi.utils.JWTUtil;
 import com.tunapearl.saturi.utils.PasswordEncoder;
 import com.tunapearl.saturi.utils.RedisUtil;
 import jakarta.mail.MessagingException;
@@ -30,6 +33,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final JavaMailSender mailSender;
     private final RedisUtil redisUtil;
+    private final JWTUtil jwtUtil;
+    private final TokenService tokenService;
 
     public List<UserEntity> findUsers() {
         return userRepository.findAll().get();
@@ -91,8 +96,11 @@ public class UserService {
         UserEntity findUser = findUsers.get(0);
         validateDeletedUser(findUser); // 탈퇴회원 검증
 
-        //TODO JWT 토큰 발급
-        return UserLoginResponseDTO.builder().build();
+        String accessToken = jwtUtil.createAccessToken(findUser.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(findUser.getUserId());
+        tokenService.saveRefreshToken(new Token(findUser.getUserId(),refreshToken));
+
+        return new UserLoginResponseDTO(accessToken, refreshToken);
     }
 
     private static void validateDeletedUser(UserEntity user) {
@@ -107,8 +115,9 @@ public class UserService {
     /**
      * 로그아웃
      */
-    public UserMsgResponseDTO logoutUser(UserLogoutRequestDTO request) {
-        //TODO JWT 토큰 삭제
+    public UserMsgResponseDTO logoutUser(String token) throws UnAuthorizedException, Exception {
+
+        tokenService.deleteRefreshToken(jwtUtil.getUserId(token));
         return new UserMsgResponseDTO("로그아웃 완료");
     }
 
