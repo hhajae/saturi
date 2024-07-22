@@ -8,22 +8,12 @@ import com.tunapearl.saturi.dto.user.UserType;
 import com.tunapearl.saturi.dto.user.social.*;
 import com.tunapearl.saturi.exception.InvalidTokenException;
 import com.tunapearl.saturi.repository.UserRepository;
-import com.tunapearl.saturi.utils.PasswordEncoder;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigInteger;
-import java.security.Key;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.RSAPublicKeySpec;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -32,8 +22,8 @@ import java.util.*;
 @Service
 public class SocialUserService {
 
-    /* 일반 로그인, 카카오 로그인, 네이버 로그인 Service 리스트*/
-    private final List<LoginService> loginServices;
+    /* 카카오 로그인, 네이버 로그인 Service 리스트*/
+    private final List<SocialLoginService> loginServices;
     private final UserRepository userRepository;
 
     /* 소셜 로그인용 필드 */
@@ -45,16 +35,21 @@ public class SocialUserService {
     public UserLoginResponseDTO doSocialLogin(UserLoginRequestDTO request) {
 
         // 유저가 로그인 한 방식 식별
-        LoginService loginService = getLoginService(request.getUserType());
+        SocialLoginService loginService = getLoginService(request.getUserType());
 
         // 유저 토큰 정보 얻기
         SocialAuthResponse authResponse = loginService.getAccessToken(request.getCode());
+        if(loginService instanceof NaverLoginServiceImpl){
+            log.info("Naver login request Here");
+            return UserLoginResponseDTO.builder().build();
+        }
 
         // 토큰 유효성 검사
         try {
             loginService.checkTokenValidity(authResponse.getAccessToken());
         }
         catch (InvalidTokenException e) {
+            //TODO: 토큰 갱신 필요
             e.getStackTrace();
         }
         catch (RuntimeException e) {
@@ -82,8 +77,8 @@ public class SocialUserService {
     }
 
     /* 여러 로그인 서비스 API 중에 어떤 서비스인지 확인하는 메서드 */
-    private LoginService getLoginService(UserType type){
-        for(LoginService loginService: loginServices){
+    private SocialLoginService getLoginService(UserType type){
+        for(SocialLoginService loginService: loginServices){
             if(loginService.getServiceName().equals(type)){
                 log.info("Selected login service: {}", loginService.getServiceName());
                 return loginService;
