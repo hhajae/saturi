@@ -1,11 +1,14 @@
 package com.tunapearl.saturi.service;
 
+import com.tunapearl.saturi.domain.user.Role;
+import com.tunapearl.saturi.domain.user.UserEntity;
 import com.tunapearl.saturi.dto.user.UserLoginRequestDTO;
 import com.tunapearl.saturi.dto.user.UserLoginResponseDTO;
 import com.tunapearl.saturi.dto.user.UserType;
 import com.tunapearl.saturi.dto.user.social.*;
 import com.tunapearl.saturi.exception.InvalidTokenException;
 import com.tunapearl.saturi.repository.UserRepository;
+import com.tunapearl.saturi.utils.PasswordEncoder;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.SignatureException;
@@ -21,6 +24,7 @@ import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Slf4j
@@ -59,9 +63,21 @@ public class SocialUserService {
 
         // 유저 개인 정보 얻기
         SocialUserResponse userResponse = loginService.getUserInfo(authResponse.getAccessToken());
-        log.info("Final User info: {}", userResponse);
 
-        // TODO: 실제 유저 정보로 바꿔야함
+        // 기존재 하던 계정인지 검사
+        Optional<List<UserEntity>> user = userRepository.findByEmail(userResponse.getEmail());
+        
+        // 없던 계정이면 회원가입
+        if(user.isEmpty()){
+            UserEntity userEntity = createNewUser(userResponse);
+            userRepository.saveUser(userEntity);
+            user = Optional.of(List.of(userEntity));
+        }
+
+        //TODO: 회원 엔티티로 JWT 생성
+        //user.get().get(0);
+
+        // TODO: 생성된 JWT 토큰 반환
         return UserLoginResponseDTO.builder().build();
     }
 
@@ -74,81 +90,19 @@ public class SocialUserService {
             }
         }
 
-        //TODO: 일반 로그인 서비스가 구현됐을 때 return 값 변경
-        return null;
+        throw new RuntimeException("The wrong approach: No selceted Service");
     }
 
-    private void checkTokenPayload(String idToken) {
-        //토큰 payload 분리
-        st = new StringTokenizer(idToken, "."); st.nextToken();
-        String decodedPayload = new String(decoder.decode(st.nextToken()));
-
-        //맵으로 저장
-        Map<String, Object> payloadMap = parser.parseMap(decodedPayload);
-
-        // 페이로드 검사
-        // 1. iss 값이 "https://kauth.kakao.com"인지 확인
-        // 2. aud 값이 "your_kakao_app_id"인지 확인
-        try {
-            Jwts.parserBuilder()
-                    .requireIssuer(payloadMap.get("iss").toString())
-                    .requireAudience(payloadMap.get("aud").toString())
-                    .build()
-                    .parseClaimsJws(idToken);
-        }
-        catch (ExpiredJwtException e) {
-            log.error("Token has expired", e);
-        } catch (SignatureException e) {
-            log.error("Invalid token signature", e);
-        } catch (Exception e) {
-            log.error("Token validation failed", e);
-        }
-    }
-    
-    private void checkTokenSignature(String idToken) {
-        //토큰 payload 분리
-        st = new StringTokenizer(idToken, ".");
-        String decodedHeader = new String(decoder.decode(st.nextToken()));
-
-        //맵으로 저장
-        Map<String, Object> headerMap = parser.parseMap(decodedHeader);
-        
-        // 헤더에서 key id 가져오기
-        String kid = headerMap.get("kid").toString();
-
-        // 카카오 인증 서버에서 공개키 리스트 가져오기
-        PublicKeyResponse keyResponse
-                = restTemplate.getForObject("https://kauth.kakao.com/.well-known/jwks.json", PublicKeyResponse.class);
-
-        // 공개키 목록에서 kid에 해당하는 공개키 확인
-        PublicKeyResponse.Key keys = keyResponse.getKeys().stream()
-                .filter(o -> o.getKid().equals(kid))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Key not found"));
-
-        // 공개키로 서명 검증
-        try {
-            Jwts.parserBuilder()
-                   .setSigningKey(getRSAPublicKey(keys.getN(), keys.getE()))
-                   .build()
-                   .parseClaimsJws(idToken);
-        }
-        catch (SignatureException e) {
-            log.error("Invalid token signature", e);
-        }
-        catch (Exception e) {
-            log.error("Token validation failed", e);
-        }
-    }
-
-
-    private Key getRSAPublicKey(String modules, String exponent) throws NoSuchAlgorithmException, InvalidKeySpecException {
-
-        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-        BigInteger n = new BigInteger(1, decoder.decode(modules));
-        BigInteger e = new BigInteger(1, decoder.decode(exponent));
-
-        RSAPublicKeySpec keySpec = new RSAPublicKeySpec(n, e);
-        return keyFactory.generatePublic(keySpec);
+    private UserEntity createNewUser(SocialUserResponse socialUserResponse){
+        UserEntity user = new UserEntity();
+        user.setEmail(socialUserResponse.getEmail());
+        user.setPassword(null);
+        user.setNickname(socialUserResponse.getNickname());
+        user.setGender(socialUserResponse.getGender());
+        user.setAgeRange(socialUserResponse.getAgeRange());
+        user.setRegDate(LocalDateTime.now());
+        user.setExp(0L);
+        user.setRole(Role.BASIC);
+        return user;
     }
 }

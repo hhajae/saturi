@@ -3,6 +3,8 @@ package com.tunapearl.saturi.service;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.tunapearl.saturi.domain.user.AgeRange;
+import com.tunapearl.saturi.domain.user.Gender;
 import com.tunapearl.saturi.dto.user.social.KakaoUserResponse;
 import com.tunapearl.saturi.dto.user.social.SocialAuthResponse;
 import com.tunapearl.saturi.dto.user.social.SocialUserResponse;
@@ -21,10 +23,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -32,6 +31,7 @@ import java.util.Optional;
 public class KakaoLoginServiceImpl implements LoginService {
     private final RestTemplate restTemplate;
     private MultiValueMap<String, String> body;
+    private Map<String, AgeRange> ageMap;
 
     @Value("${social.client.kakao.grant-type}")
     private String grantType;
@@ -50,6 +50,20 @@ public class KakaoLoginServiceImpl implements LoginService {
         body.add("client_id", clientId);
         body.add("redirect_uri", redirectUri);
         body.add("client_secret", clientSecret);
+
+        ageMap = new HashMap<>();
+        ageMap.put("1~9", AgeRange.CHILD);
+        ageMap.put("10~14", AgeRange.TEENAGER);
+        ageMap.put("15~19", AgeRange.TEENAGER);
+        ageMap.put("20~29", AgeRange.TWENTEEN);
+        ageMap.put("30~39", AgeRange.THIRTEEN);
+        ageMap.put("40~49", AgeRange.FOURTEEN);
+        ageMap.put("50~59", AgeRange.FOURTEEN);
+        ageMap.put("60~69", AgeRange.SIXTEEN);
+        ageMap.put("70~79", AgeRange.SEVENTEEN);
+        ageMap.put("80~89", AgeRange.EIGHTEEN);
+        ageMap.put("90~", AgeRange.NINETEEN);
+
     }
 
     @Override
@@ -152,12 +166,14 @@ public class KakaoLoginServiceImpl implements LoginService {
                 Optional.ofNullable(kakaoUserResponse.getKakao_account())
                         .orElse(KakaoUserResponse.KakaoUserData.builder().build());
 
+
         //유저정보를 DTO에 감싸서 반환
+        Gender gender = (kakaoUserData.getGender().equals("FEMALE"))?(Gender.FEMALE):(Gender.MALE);
         return SocialUserResponse.builder()
                 .nickname(kakaoUserData.getProfile().getNickname())
                 .email(kakaoUserData.getEmail())
-                .gender(kakaoUserData.getGender())
-                .ageRange(kakaoUserData.getAgeRange())
+                .gender(gender)
+                .ageRange(ageMap.get(kakaoUserData.getAgeRange()))
                 .build();
     }
 }

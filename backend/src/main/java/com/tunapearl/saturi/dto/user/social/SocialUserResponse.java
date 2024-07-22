@@ -1,6 +1,8 @@
 package com.tunapearl.saturi.dto.user.social;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.tunapearl.saturi.domain.user.AgeRange;
+import com.tunapearl.saturi.domain.user.Gender;
 import lombok.*;
 
 @Builder
@@ -11,6 +13,6 @@ import lombok.*;
 public class SocialUserResponse {
     private String nickname;
     private String email;
-    private String gender;
-    private String ageRange;
+    private Gender gender;
+    private AgeRange ageRange;
 }
