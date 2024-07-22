@@ -1,5 +1,9 @@
 package com.tunapearl.saturi.service;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.tunapearl.saturi.dto.user.social.KakaoUserResponse;
 import com.tunapearl.saturi.dto.user.social.SocialAuthResponse;
 import com.tunapearl.saturi.dto.user.social.SocialUserResponse;
 import com.tunapearl.saturi.dto.user.UserType;
@@ -14,8 +18,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -111,13 +120,44 @@ public class KakaoLoginServiceImpl implements LoginService {
 
     @Override
     public SocialUserResponse getUserInfo(String accessToken) {
-        String url = "\thttps://kapi.kakao.com/v2/user/me";
+
+        //쿼리 파라미터 & URI 셋팅
+        String url = "https://kapi.kakao.com/v2/user/me";
 
         //헤더 셋팅
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        return null;
+        //요청 보내기
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                requestEntity,
+                String.class
+        );
+        log.info("Kakao user response: {}", response.getBody());
+
+        //Json 파싱
+        String jsonString = response.getBody();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
+
+        //파싱한 Json으로 유저정보 뽑아내기
+        KakaoUserResponse kakaoUserResponse = gson.fromJson(jsonString, KakaoUserResponse.class);
+        KakaoUserResponse.KakaoUserData kakaoUserData =
+                Optional.ofNullable(kakaoUserResponse.getKakao_account())
+                        .orElse(KakaoUserResponse.KakaoUserData.builder().build());
+
+        //유저정보를 DTO에 감싸서 반환
+        return SocialUserResponse.builder()
+                .nickname(kakaoUserData.getProfile().getNickname())
+                .email(kakaoUserData.getEmail())
+                .gender(kakaoUserData.getGender())
+                .ageRange(kakaoUserData.getAgeRange())
+                .build();
     }
 }

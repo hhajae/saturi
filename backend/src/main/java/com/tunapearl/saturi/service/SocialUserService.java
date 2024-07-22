@@ -48,7 +48,7 @@ public class SocialUserService {
 
         // 토큰 유효성 검사
         try {
-            ((KakaoLoginServiceImpl) loginService).checkTokenValidity(authResponse.getAccessToken());
+            loginService.checkTokenValidity(authResponse.getAccessToken());
         }
         catch (InvalidTokenException e) {
             e.getStackTrace();
@@ -59,7 +59,7 @@ public class SocialUserService {
 
         // 유저 개인 정보 얻기
         SocialUserResponse userResponse = loginService.getUserInfo(authResponse.getAccessToken());
-        log.info("User info: {}", userResponse);
+        log.info("Final User info: {}", userResponse);
 
         // TODO: 실제 유저 정보로 바꿔야함
         return UserLoginResponseDTO.builder().build();

@@ -1,7 +1,6 @@
 package com.tunapearl.saturi.controller;
 
 import com.tunapearl.saturi.domain.*;
-import com.tunapearl.saturi.dto.*;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.*;
 import com.tunapearl.saturi.service.*;

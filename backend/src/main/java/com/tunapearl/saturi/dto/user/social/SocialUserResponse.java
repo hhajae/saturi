@@ -1,5 +1,6 @@
 package com.tunapearl.saturi.dto.user.social;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Builder
@@ -8,7 +9,7 @@ import lombok.*;
 @Getter
 @ToString
 public class SocialUserResponse {
-    private Long userId;
+    private String nickname;
     private String email;
     private String gender;
     private String ageRange;
