@@ -1,4 +1,4 @@
-package com.tunapearl.saturi.dto;
+package com.tunapearl.saturi.dto.user.social;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -13,6 +13,7 @@ public class SocialAuthResponse {
     @JsonProperty("access_token")
     private String accessToken;
 
+    //DB 저장 대상
     @JsonProperty("refresh_token")
     private String refreshToken;
 

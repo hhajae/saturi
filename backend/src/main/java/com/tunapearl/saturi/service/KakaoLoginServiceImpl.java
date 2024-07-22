@@ -1,7 +1,7 @@
 package com.tunapearl.saturi.service;
 
-import com.tunapearl.saturi.dto.SocialAuthResponse;
-import com.tunapearl.saturi.dto.SocialUserResponse;
+import com.tunapearl.saturi.dto.user.social.SocialAuthResponse;
+import com.tunapearl.saturi.dto.user.social.SocialUserResponse;
 import com.tunapearl.saturi.dto.UserType;
 import com.tunapearl.saturi.exception.InvalidTokenException;
 import jakarta.annotation.PostConstruct;
@@ -15,14 +15,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KakaoLoginServiceImpl implements SocialLoginService {
+public class KakaoLoginServiceImpl implements LoginService {
     private final RestTemplate restTemplate;
     private MultiValueMap<String, String> body;
 
@@ -113,6 +111,13 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
 
     @Override
     public SocialUserResponse getUserInfo(String accessToken) {
+        String url = "\thttps://kapi.kakao.com/v2/user/me";
+
+        //헤더 셋팅
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
         return null;
     }
 }

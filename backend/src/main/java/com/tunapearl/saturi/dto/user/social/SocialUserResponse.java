@@ -1,4 +1,4 @@
-package com.tunapearl.saturi.dto;
+package com.tunapearl.saturi.dto.user.social;
 
 import lombok.*;
 

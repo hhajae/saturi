@@ -1,7 +1,7 @@
 package com.tunapearl.saturi.service;
 
-import com.tunapearl.saturi.domain.UserEntity;
 import com.tunapearl.saturi.dto.*;
+import com.tunapearl.saturi.dto.user.social.*;
 import com.tunapearl.saturi.exception.InvalidTokenException;
 import com.tunapearl.saturi.repository.UserRepository;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -17,7 +17,6 @@ import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.*;
@@ -25,10 +24,10 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class SocialUserService {
 
     /* 일반 로그인, 카카오 로그인, 네이버 로그인 Service 리스트*/
-    private final List<SocialLoginService> loginServices;
+    private final List<LoginService> loginServices;
     private final UserRepository userRepository;
 
     /* 소셜 로그인용 필드 */
@@ -37,12 +36,10 @@ public class UserService {
     BasicJsonParser parser = new BasicJsonParser();
     StringTokenizer st;
 
-
-
     public LoginResponse doSocialLogin(SocialLoginRequest request) {
 
         // 유저가 로그인 한 방식 식별
-        SocialLoginService loginService = getLoginService(request.getUserType());
+        LoginService loginService = getLoginService(request.getUserType());
 
         // 유저 토큰 정보 얻기
         SocialAuthResponse authResponse = loginService.getAccessToken(request.getCode());
@@ -67,8 +64,8 @@ public class UserService {
     }
 
     /* 여러 로그인 서비스 API 중에 어떤 서비스인지 확인하는 메서드 */
-    private SocialLoginService getLoginService(UserType type){
-        for(SocialLoginService loginService: loginServices){
+    private LoginService getLoginService(UserType type){
+        for(LoginService loginService: loginServices){
             if(loginService.getServiceName().equals(type)){
                 log.info("Selected login service: {}", loginService.getServiceName());
                 return loginService;

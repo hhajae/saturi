@@ -1,5 +1,6 @@
-package com.tunapearl.saturi.dto;
+package com.tunapearl.saturi.dto.user.social;
 
+import com.tunapearl.saturi.dto.UserType;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
