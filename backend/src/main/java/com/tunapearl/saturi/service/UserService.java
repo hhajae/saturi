@@ -192,13 +192,13 @@ public class UserService {
         int authNumber = makeRandomNumber();
         String setFrom = "gkwo7108@gmail.com"; // email-config에 설정한 자신의 이메일 주소를 입력
         String toMail = email;
-        String title = "회원 가입 인증 이메일 입니다."; // 이메일 제목
+        String title = "사투리는 서툴러유 인증번호";
         String content =
-                "나의 APP을 방문해주셔서 감사합니다." + 	//html 형식으로 작성 !
+                "사투리는 서툴러유를 방문해주셔서 감사합니다😊" +
                         "<br><br>" +
                         "인증 번호는 " + authNumber + "입니다." +
                         "<br>" +
-                        "인증번호를 제대로 입력해주세요"; //이메일 내용 삽입
+                        "인증번호를 홈페이지 내에 입력해주세요";
         mailSend(setFrom, toMail, title, content, authNumber);
         return Integer.toString(authNumber);
     }
