@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserDeleteResponseDTO {
-    private Long userId;
+public class UserDeleteRequestDTO {
+    private Long userId; //FIXME 토큰으로 수정 필요
 }

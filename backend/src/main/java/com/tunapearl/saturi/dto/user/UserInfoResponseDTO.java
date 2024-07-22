@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
-public class UserLoginResponseDTO {
+public class UserInfoResponseDTO {
     private Long userId; //FIXME 토큰으로 수정 필요
     private String email;
     private String nickname;

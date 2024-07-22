@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserLogoutResponseDTO {
-    private Long userId;
+public class UserMsgResponseDTO {
+    private String msg;
 }

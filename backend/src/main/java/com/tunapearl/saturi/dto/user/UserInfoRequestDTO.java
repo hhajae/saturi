@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserRegisterResponseDTO {
-    private Long id;
+public class UserInfoRequestDTO {
+    private String token;
 }

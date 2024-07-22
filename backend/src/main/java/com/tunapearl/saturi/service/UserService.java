@@ -29,19 +29,27 @@ public class UserService {
     private final JavaMailSender mailSender;
     private final RedisUtil redisUtil;
 
+    public List<UserEntity> findUsers() {
+        return userRepository.findAll().get();
+    }
+
+    public UserEntity findById(Long id) {
+        return userRepository.findByUserId(id).get();
+    }
+    
     /**
      * 일반회원 회원가입
      */
     @Transactional
-    public UserRegisterResponseDTO registerUser(UserRegisterRequestDTO request) {
+    public UserMsgResponseDTO registerUser(UserRegisterRequestDTO request) {
         validateDuplicateUserEmail(request.getEmail());
         validateDuplicateUserNickname(request.getNickname());
         UserEntity user = createNewUser(request);
         userRepository.saveUser(user);
-        return new UserRegisterResponseDTO(user.getUserId());
+        return new UserMsgResponseDTO("유저 회원가입 성공");
     }
 
-    private void validateDuplicateUserEmail(String email) {
+    public void validateDuplicateUserEmail(String email) {
         List<UserEntity> findUsers = userRepository.findByEmail(email).get();
         if(!findUsers.isEmpty()) {
 //            throw new IllegalStateException("이미 존재하는 회원입니다.");
@@ -49,7 +57,7 @@ public class UserService {
         }
     }
 
-    private void validateDuplicateUserNickname(String nickname) {
+    public void validateDuplicateUserNickname(String nickname) {
         List<UserEntity> findUsers = userRepository.findByNickname(nickname).get();
         if(!findUsers.isEmpty()) {
 //            throw new IllegalStateException("이미 존재하는 닉네임입니다.");
@@ -78,10 +86,11 @@ public class UserService {
         List<UserEntity> findUsers = userRepository.findByEmailAndPassword(request.getEmail(),
                 PasswordEncoder.encrypt(request.getEmail(), request.getPassword())).get();
         validateAuthenticateUser(findUsers); // 아이디, 비밀번호 일치 여부 검증
-        UserEntity user = findUsers.get(0);
-        validateDeletedUser(user); // 탈퇴회원 검증
+        UserEntity findUser = findUsers.get(0);
+        validateDeletedUser(findUser); // 탈퇴회원 검증
         //TODO JWT 토큰 발급
-        return new UserLoginResponseDTO(user.getUserId(), user.getEmail(), user.getNickname());
+        return new UserLoginResponseDTO(findUser.getUserId(), findUser.getEmail(), findUser.getNickname(), findUser.getRegDate(),
+                findUser.getExp(), findUser.getGender(), findUser.getRole(), findUser.getAgeRange(), findUser.getQuokka());
     }
 
     private static void validateDeletedUser(UserEntity user) {
@@ -96,21 +105,20 @@ public class UserService {
     /**
      * 로그아웃
      */
-    public UserLogoutResponseDTO logoutUser(UserLogoutRequestDTO request) {
+    public UserMsgResponseDTO logoutUser(UserLogoutRequestDTO request) {
         //TODO JWT 토큰 삭제
-        return new UserLogoutResponseDTO(request.getUserId());
+        return new UserMsgResponseDTO("로그아웃 완료");
     }
-
 
     /**
      * 회원 수정
      */
     @Transactional
-    public UserUpdateResponseDTO updateUser(UserUpdateRequestDTO request) {
+    public UserMsgResponseDTO updateUser(UserUpdateRequestDTO request) {
         validateDuplicateUserNickname(request.getNickname());
         UserEntity findUser = userRepository.findByUserId(request.getUserId()).get();
         changeUserInfo(findUser, request.getNickname(), request.getLocation(), request.getGender(), request.getRole());
-        return new UserUpdateResponseDTO(findUser.getUserId());
+        return new UserMsgResponseDTO("회원 수정 완료");
     }
 
     private void changeUserInfo(UserEntity findUser, String nickname, Location location, Gender gender, Role role) {
@@ -120,6 +128,9 @@ public class UserService {
         findUser.setRole(role);
     }
 
+    /**
+     * 일반회원 비밀번호 변경
+     */
     @Transactional
     public UserPasswordUpdateResponseDTO updateUserPassword(UserPasswordUpdateRequestDTO request) {
         UserEntity findUser = userRepository.findByUserId(request.getUserId()).get();
@@ -145,23 +156,15 @@ public class UserService {
      * 회원 삭제
      */
     @Transactional
-    public UserDeleteResponseDTO deleteUser(Long userId) {
+    public UserMsgResponseDTO deleteUser(Long userId) {
         UserEntity findUser = userRepository.findByUserId(userId).get();
         changeUserDeleteStatus(findUser);
-        return new UserDeleteResponseDTO(findUser.getUserId());
+        return new UserMsgResponseDTO("회원 탈퇴 완료");
     }
 
     private void changeUserDeleteStatus(UserEntity findUser) {
         findUser.setDeletedDt(LocalDateTime.now());
         findUser.setIsDeleted(true);
-    }
-
-    public List<UserEntity> findUsers() {
-        return userRepository.findAll().get();
-    }
-
-    public UserEntity findById(Long id) {
-        return userRepository.findByUserId(id).get();
     }
 
     /**
@@ -219,5 +222,20 @@ public class UserService {
         redisUtil.setDataExpire(Integer.toString(authNumber), toMail, 60*5L);
 
     }
+
+    /**
+     * 회원 프로필 조회
+     */
+    public UserInfoResponseDTO getUserProfile(Long userId) {
+        UserEntity findUser = userRepository.findByUserId(userId).get();
+        return new UserInfoResponseDTO(findUser.getUserId(), findUser.getEmail(), findUser.getNickname(), findUser.getRegDate(),
+                findUser.getExp(), findUser.getGender(), findUser.getRole(), findUser.getAgeRange(), findUser.getQuokka());
+    }
+
+    public Long getUserIdByToken() {
+        //TODO 토큰 디코딩 필요
+        return null;
+    }
+
 
 }

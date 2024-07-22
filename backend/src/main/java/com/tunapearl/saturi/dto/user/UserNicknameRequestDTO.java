@@ -5,6 +5,6 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserUpdateResponseDTO {
-    private Long userId;
+public class UserNicknameRequestDTO {
+    private String nickname;
 }

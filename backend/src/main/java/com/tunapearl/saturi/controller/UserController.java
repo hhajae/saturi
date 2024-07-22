@@ -1,6 +1,7 @@
 package com.tunapearl.saturi.controller;
 
 
+import com.tunapearl.saturi.domain.user.UserEntity;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.service.UserService;
 import jakarta.mail.MessagingException;
@@ -26,9 +27,29 @@ public class UserController {
      * 일반회원 회원가입
      */
     @PostMapping("/auth")
-    public ResponseEntity<UserRegisterResponseDTO> userRegister(@RequestBody @Valid UserRegisterRequestDTO request) {
-        //TODO log 남기기
+    public ResponseEntity<UserMsgResponseDTO> userRegister(@RequestBody @Valid UserRegisterRequestDTO request) {
+        log.info("Received normal user register request for {}", request.getEmail());
         return ResponseEntity.created(URI.create("/auth")).body(userService.registerUser(request));
+    }
+
+    /**
+     * 이메일 중복확인
+     */
+    @GetMapping("/auth/email-dupcheck")
+    public ResponseEntity<UserMsgResponseDTO> userEmailDuplicateCheck(@RequestBody @Valid EmailRequestDTO request) {
+        log.info("Received email duplicate check request for {}", request.getEmail());
+        userService.validateDuplicateUserEmail(request.getEmail());
+        return ResponseEntity.ok().body(new UserMsgResponseDTO("ok"));
+    }
+
+    /**
+     * 닉네임 중복확인
+     */
+    @GetMapping("/auth/nickname-dupcheck")
+    public ResponseEntity<UserMsgResponseDTO> userNicknameDuplicateCheck(@RequestBody @Valid UserNicknameRequestDTO request) {
+        log.info("Received nickname duplicate check request for {}", request.getNickname());
+        userService.validateDuplicateUserNickname(request.getNickname());
+        return ResponseEntity.ok().body(new UserMsgResponseDTO("ok"));
     }
 
     /**
@@ -36,17 +57,28 @@ public class UserController {
      */
     @PostMapping("/auth/login")
     public ResponseEntity<UserLoginResponseDTO> userLogin(@RequestBody @Valid UserLoginRequestDTO request) {
-        //TODO log 남기기
-        return ResponseEntity.created(URI.create("/auth/login")).body(userService.loginUser(request));
+        log.info("Received normal user login request for {}", request.getEmail());
+        return ResponseEntity.ok().body(userService.loginUser(request));
+    }
+
+    /**
+     * 회원 프로필 조회
+     */
+    @GetMapping("/auth/profile")
+    public ResponseEntity<UserInfoResponseDTO> userProfile(@RequestBody @Valid UserInfoRequestDTO request) {
+        log.info("Received user profile info request for {}", request.getToken());
+        //TODO 토큰 디코딩해서 id 빼기
+        Long userId = userService.getUserIdByToken();
+        return ResponseEntity.ok().body(userService.getUserProfile(userId));
     }
 
     /**
      * 회원 수정
      */
     @PutMapping("/auth")
-    public ResponseEntity<UserUpdateResponseDTO> userUpdate(@RequestBody @Valid UserUpdateRequestDTO request) {
-        //TODO log 남기기
-        return ResponseEntity.created(URI.create("/auth")).body(userService.updateUser(request));
+    public ResponseEntity<UserMsgResponseDTO> userUpdate(@RequestBody @Valid UserUpdateRequestDTO request) {
+        log.info("Received user update request for {}", request.getUserId());
+        return ResponseEntity.ok().body(userService.updateUser(request));
     }
 
     /**
@@ -54,33 +86,43 @@ public class UserController {
      */
     @PutMapping("/auth/password-update")
     public ResponseEntity<UserPasswordUpdateResponseDTO> userUpdatePassword(@RequestBody @Valid UserPasswordUpdateRequestDTO request) {
-        //TODO log 남기기
-        return ResponseEntity.created(URI.create("/auth/password-update")).body(userService.updateUserPassword(request));
+        log.info("Received normal user password update request for {}", request.getUserId());
+        return ResponseEntity.ok().body(userService.updateUserPassword(request));
     }
 
     /**
      * 회원 삭제(DB 삭제 x, 회원탈퇴 상태로 변경)
      */
-    @DeleteMapping("/auth/{userId}")
-    public ResponseEntity<UserDeleteResponseDTO> userDelete(@PathVariable("userId") Long userId) {
-        //TODO log 남기기
-        return ResponseEntity.created(URI.create("/auth")).body(userService.deleteUser(userId));
+    @DeleteMapping("/auth")
+    public ResponseEntity<UserMsgResponseDTO> userDelete(@RequestBody @Valid UserDeleteRequestDTO request) {
+        log.info("Received normal user delete request for {}", request.getUserId());
+        return ResponseEntity.ok().body(userService.deleteUser(request.getUserId()));
     }
 
+
+    /**
+     * 이메일 인증 메일 전송
+     */
     @PostMapping("/auth/email-valid")
-    public ResponseEntity<String> mailSend(@RequestBody @Valid EmailRequestDTO request) {
+    public ResponseEntity<String> emailSend(@RequestBody @Valid EmailRequestDTO request) {
+        //FIXME exception 수정 필요, 반환 타입 수정 필요
+        log.info("Received normal user email send request for {}", request.getEmail());
         try {
-            return ResponseEntity.created(URI.create("/auth/email-valid")).body(userService.joinEmail(request.getEmail()));
+            return ResponseEntity.ok().body(userService.joinEmail(request.getEmail()));
         } catch (MessagingException e) {
             throw new RuntimeException(e);
         }
     }
 
+    /**
+     * 이메일 인증번호 인증
+     */
     @PostMapping("/auth/email-valid-code")
-    public ResponseEntity<String> AuthCheck(@RequestBody @Valid EmailCheckDTO request){
-        Boolean Checked = userService.CheckAuthNum(request.getEmail(),request.getAuthNum());
-        if(Checked) {
-            return ResponseEntity.created(URI.create("/auth/email-valid-code")).body("ok");
+    public ResponseEntity<String> emailAuthCheck(@RequestBody @Valid EmailCheckDTO request){
+        //FIXME exception 수정 필요, 반환 타입 수정 필요
+        log.info("Received normal user email auth check request for {}", request.getEmail());
+        if(userService.CheckAuthNum(request.getEmail(),request.getAuthNum())) {
+            return ResponseEntity.ok().body("ok");
         }
         else{
             throw new NullPointerException("error!");
