@@ -28,6 +28,7 @@ import java.net.URI;
 public class UserController {
 
     private final UserService userService;
+    private final SocialUserService socialUserService;
     private final JWTUtil jwtUtil;
     private final TokenService tokenService;
 
@@ -36,10 +37,6 @@ public class UserController {
      */
     @PostMapping("/auth")
     public ResponseEntity<UserMsgResponseDTO> userRegister(@RequestBody @Valid UserRegisterRequestDTO request) {
-        //TODO: 일반, 소셜 로그인 분리하기
-        //log.info("Received social login request for {}", request.getCode());
-        //return ResponseEntity.created(URI.create("/auth/login")).body(userService.doSocialLogin(request));
-
         log.info("Received normal user register request for {}", request.getEmail());
         return ResponseEntity.created(URI.create("/auth")).body(userService.registerUser(request));
     }
@@ -69,12 +66,19 @@ public class UserController {
      */
     @PostMapping("/auth/login")
     public ResponseEntity<UserLoginResponseDTO> userLogin(@RequestBody @Valid UserLoginRequestDTO request) {
-        log.info("Received normal user login request for {}", request.getEmail());
+        //TODO: 일반, 소셜 로그인 분리하기
 
-        //TODO: JWT 서비스로 이동(login, , )
-        // String accessToken= jwtUtil.createAccessToken(user.getUserId());
-        // String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
-        return ResponseEntity.ok().body(userService.loginUser(request));
+        if(request.getUserType() == UserType.NORMAL){
+            //TODO: JWT 서비스로 이동(login, , )
+            // String accessToken= jwtUtil.createAccessToken(user.getUserId());
+            // String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
+            log.info("Received normal user login request for {}", request.getEmail());
+            return ResponseEntity.ok().body(userService.loginUser(request));
+        }
+        else{
+            log.info("Received social login request for {}", request.getCode());
+            return ResponseEntity.created(URI.create("/auth/login")).body(socialUserService.doSocialLogin(request));
+        }
     }
 
     @GetMapping("/logout")
