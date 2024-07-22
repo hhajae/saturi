@@ -26,12 +26,6 @@ public class SocialUserService {
     private final List<SocialLoginService> loginServices;
     private final UserRepository userRepository;
 
-    /* 소셜 로그인용 필드 */
-    private RestTemplate restTemplate = new RestTemplate();
-    Base64.Decoder decoder = Base64.getDecoder();
-    BasicJsonParser parser = new BasicJsonParser();
-    StringTokenizer st;
-
     public UserLoginResponseDTO doSocialLogin(UserLoginRequestDTO request) {
 
         // 유저가 로그인 한 방식 식별
@@ -49,7 +43,7 @@ public class SocialUserService {
             loginService.checkTokenValidity(authResponse.getAccessToken());
         }
         catch (InvalidTokenException e) {
-            //TODO: 토큰 갱신 필요
+            //TODO: 토큰 갱신 필요(refresh)
             e.getStackTrace();
         }
         catch (RuntimeException e) {

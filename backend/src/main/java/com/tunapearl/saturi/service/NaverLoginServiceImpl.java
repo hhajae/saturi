@@ -60,22 +60,12 @@ public class NaverLoginServiceImpl implements SocialLoginService {
         }
         URI uri = builder.queryParam("code", code).build().toUri();
 
-        //헤더, 바디 설정(할거 없음 그냥 형식상)
-        HttpHeaders headers = new HttpHeaders();
-        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
-        
-        //요청
-        ResponseEntity<SocialAuthResponse> response = restTemplate.exchange(
-                uri,
-                HttpMethod.GET,
-                requestEntity,
-                SocialAuthResponse.class
-        );
+        // 요청
+        SocialAuthResponse response = restTemplate.getForObject(uri, SocialAuthResponse.class);
         
         //로깅
-        log.info("Naver Access Token Headers: {}", response.getHeaders());
-        log.info("Naver Access Token Response: {}", response.getBody());
-        return response.getBody();
+        log.info("Naver Access Token: {}", response.toString());
+        return response;
     }
 
     @Override
