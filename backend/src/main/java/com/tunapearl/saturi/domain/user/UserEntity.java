@@ -1,5 +1,6 @@
 package com.tunapearl.saturi.domain.user;
 
+import com.tunapearl.saturi.domain.LocationEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,8 +18,9 @@ public class UserEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @Enumerated(STRING)
-    private Location location;
+    @ManyToOne
+    @JoinColumn(name = "location_id")
+    private LocationEntity location;
 
     private String email;
 

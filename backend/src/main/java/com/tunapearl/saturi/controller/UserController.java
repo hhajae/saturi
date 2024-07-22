@@ -1,7 +1,6 @@
 package com.tunapearl.saturi.controller;
 
 import com.tunapearl.saturi.domain.*;
-import com.tunapearl.saturi.dto.*;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.*;
 import com.tunapearl.saturi.service.*;
@@ -108,10 +107,9 @@ public class UserController {
      * 회원 프로필 조회
      */
     @GetMapping("/auth/profile")
-    public ResponseEntity<UserInfoResponseDTO> userProfile(@RequestBody @Valid UserInfoRequestDTO request) {
-        log.info("Received user profile info request for {}", request.getToken());
-        //TODO 토큰 디코딩해서 id 빼기
-        Long userId = userService.getUserIdByToken();
+    public ResponseEntity<UserInfoResponseDTO> userProfile(@RequestHeader("accessToken") String authorization) throws UnAuthorizedException {
+        Long userId = jwtUtil.getUserId(authorization);
+        log.info("Received user profile info request for {}", userId);
         return ResponseEntity.ok().body(userService.getUserProfile(userId));
     }
 
@@ -119,27 +117,35 @@ public class UserController {
      * 회원 수정
      */
     @PutMapping("/auth")
-    public ResponseEntity<UserMsgResponseDTO> userUpdate(@RequestBody @Valid UserUpdateRequestDTO request) {
-        log.info("Received user update request for {}", request.getUserId());
-        return ResponseEntity.ok().body(userService.updateUser(request));
+    public ResponseEntity<UserMsgResponseDTO> userUpdate(@RequestHeader("accessToken") String authorization,
+                                                         @RequestBody @Valid UserUpdateRequestDTO request) throws UnAuthorizedException {
+        Long userId = jwtUtil.getUserId(authorization);
+        log.info("Received user update request for {}", userId);
+        return ResponseEntity.ok().body(userService.updateUser(userId, request));
     }
 
     /**
      * 회원 비밀번호 변경
      */
     @PutMapping("/auth/password-update")
-    public ResponseEntity<UserPasswordUpdateResponseDTO> userUpdatePassword(@RequestBody @Valid UserPasswordUpdateRequestDTO request) {
-        log.info("Received normal user password update request for {}", request.getUserId());
-        return ResponseEntity.ok().body(userService.updateUserPassword(request));
+    public ResponseEntity<UserMsgResponseDTO> userUpdatePassword(@RequestHeader("accessToken") String authorization,
+                                                                 @RequestBody @Valid UserPasswordUpdateRequestDTO request) throws UnAuthorizedException {
+        Long userId = jwtUtil.getUserId(authorization);
+        log.info("Received user password update request for {}", userId);
+        return ResponseEntity.ok().body(userService.updateUserPassword(userId, request));
     }
 
     /**
      * 회원 삭제(DB 삭제 x, 회원탈퇴 상태로 변경)
      */
     @DeleteMapping("/auth")
-    public ResponseEntity<UserMsgResponseDTO> userDelete(@RequestBody @Valid UserDeleteRequestDTO request) {
-        log.info("Received normal user delete request for {}", request.getUserId());
-        return ResponseEntity.ok().body(userService.deleteUser(request.getUserId()));
+    public ResponseEntity<UserMsgResponseDTO> userDelete(@RequestHeader("accessToken") String authorization) throws Exception, UnAuthorizedException {
+        Long userId = jwtUtil.getUserId(authorization);
+        log.info("Received user delete request for {}", userId);
+
+        tokenService.deleteRefreshToken(userId); // 토큰 삭제
+
+        return ResponseEntity.ok().body(userService.deleteUser(userId));
     }
 
 
