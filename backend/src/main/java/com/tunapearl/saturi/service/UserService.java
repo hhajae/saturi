@@ -1,10 +1,13 @@
 package com.tunapearl.saturi.service;
 
+import com.tunapearl.saturi.domain.Token;
 import com.tunapearl.saturi.domain.user.*;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.DuplicatedUserEmailException;
 import com.tunapearl.saturi.exception.DuplicatedUserNicknameException;
+import com.tunapearl.saturi.exception.UnAuthorizedException;
 import com.tunapearl.saturi.repository.UserRepository;
+import com.tunapearl.saturi.utils.JWTUtil;
 import com.tunapearl.saturi.utils.PasswordEncoder;
 import com.tunapearl.saturi.utils.RedisUtil;
 import jakarta.mail.MessagingException;
@@ -30,6 +33,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final JavaMailSender mailSender;
     private final RedisUtil redisUtil;
+    private final JWTUtil jwtUtil;
+    private final TokenService tokenService;
 
     public List<UserEntity> findUsers() {
         return userRepository.findAll().get();
@@ -38,7 +43,7 @@ public class UserService {
     public UserEntity findById(Long id) {
         return userRepository.findByUserId(id).get();
     }
-    
+
     /**
      * 일반회원 회원가입
      */
@@ -53,7 +58,7 @@ public class UserService {
 
     public void validateDuplicateUserEmail(String email) {
         List<UserEntity> findUsers = userRepository.findByEmail(email).get();
-        if(!findUsers.isEmpty()) {
+        if (!findUsers.isEmpty()) {
 //            throw new IllegalStateException("이미 존재하는 회원입니다.");
             throw new DuplicatedUserEmailException("이미 존재하는 회원입니다.");
         }
@@ -61,7 +66,7 @@ public class UserService {
 
     public void validateDuplicateUserNickname(String nickname) {
         List<UserEntity> findUsers = userRepository.findByNickname(nickname).get();
-        if(!findUsers.isEmpty()) {
+        if (!findUsers.isEmpty()) {
 //            throw new IllegalStateException("이미 존재하는 닉네임입니다.");
             throw new DuplicatedUserNicknameException("이미 존재하는 닉네임입니다.");
         }
@@ -91,24 +96,29 @@ public class UserService {
         UserEntity findUser = findUsers.get(0);
         validateDeletedUser(findUser); // 탈퇴회원 검증
 
-        //TODO JWT 토큰 발급
-        return UserLoginResponseDTO.builder().build();
+        String accessToken = jwtUtil.createAccessToken(findUser.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(findUser.getUserId());
+        tokenService.saveRefreshToken(new Token(findUser.getUserId(),refreshToken));
+
+        return new UserLoginResponseDTO(accessToken, refreshToken);
     }
 
     private static void validateDeletedUser(UserEntity user) {
-        if(user.getIsDeleted()) throw new IllegalStateException("탈퇴된 회원입니다.");
+        if (user.getIsDeleted()) throw new IllegalStateException("탈퇴된 회원입니다.");
     }
 
     private static void validateAuthenticateUser(List<UserEntity> findUsers) {
-        if(findUsers.isEmpty()) {
+        if (findUsers.isEmpty()) {
             throw new IllegalStateException("아이디 혹은 비밀번호가 일치하지 않습니다.");
         }
     }
+
     /**
      * 로그아웃
      */
-    public UserMsgResponseDTO logoutUser(UserLogoutRequestDTO request) {
-        //TODO JWT 토큰 삭제
+    public UserMsgResponseDTO logoutUser(String token) throws UnAuthorizedException, Exception {
+
+        tokenService.deleteRefreshToken(jwtUtil.getUserId(token));
         return new UserMsgResponseDTO("로그아웃 완료");
     }
 
@@ -143,13 +153,13 @@ public class UserService {
     }
 
     private static void validateCorrectCurrentPassword(String currentPassword, UserEntity findUser) {
-        if(!findUser.getPassword().equals(PasswordEncoder.encrypt(findUser.getEmail(), currentPassword))) {
+        if (!findUser.getPassword().equals(PasswordEncoder.encrypt(findUser.getEmail(), currentPassword))) {
             throw new IllegalStateException("현재 비밀번호가 일치하지 않습니다.");
         }
     }
 
     private static void validateCheckNewPassword(String newPassword, UserEntity findUser) {
-        if(findUser.getPassword().equals(PasswordEncoder.encrypt(findUser.getEmail(), newPassword))) {
+        if (findUser.getPassword().equals(PasswordEncoder.encrypt(findUser.getEmail(), newPassword))) {
             throw new IllegalStateException("현재 비밀번호와 일치합니다. 새로운 비밀번호로 변경해주세요.");
         }
     }
@@ -176,7 +186,7 @@ public class UserService {
         //FIXME 인증번호 폼 변경 필요? (ex -> 8z76wq)
         Random r = new Random();
         StringBuilder randomNumber = new StringBuilder();
-        for(int i = 0; i < 6; i++) {
+        for (int i = 0; i < 6; i++) {
             randomNumber.append(Integer.toString(r.nextInt(10)));
         }
         return Integer.parseInt(randomNumber.toString());
@@ -184,7 +194,7 @@ public class UserService {
 
     public boolean checkAuthNum(String email, String authNum) {
         String getAuthNum = redisUtil.getData(authNum);
-        if(getAuthNum == null) return false;
+        if (getAuthNum == null) return false;
         return getAuthNum.equals(email);
     }
 
@@ -206,16 +216,16 @@ public class UserService {
     public void emailSend(String setFromEmail, String setToEmail, String title, String content, int authNumber) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         try {
-            MimeMessageHelper helper = new MimeMessageHelper(message,true,"utf-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
             helper.setFrom(setFromEmail);
             helper.setTo(setToEmail);
             helper.setSubject(title);
-            helper.setText(content,true);
+            helper.setText(content, true);
             mailSender.send(message);
         } catch (MessagingException e) {
             log.error("email send error", e);
         }
-        redisUtil.setDataExpire(Integer.toString(authNumber), setToEmail, 60*5L); // redis에 인증번호 저장("123456" : "email@email")
+        redisUtil.setDataExpire(Integer.toString(authNumber), setToEmail, 60 * 5L); // redis에 인증번호 저장("123456" : "email@email")
 
     }
 
