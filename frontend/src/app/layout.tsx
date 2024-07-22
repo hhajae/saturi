@@ -1,7 +1,9 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import {NextUIProvider} from "@nextui-org/react";
+import { NextUIProvider } from "@nextui-org/react";
+import Link from "next/link";
+import { Button } from "@nextui-org/react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +21,17 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <NextUIProvider>
+          <header className="header">
+            <Link href="/main">
+              <img src="/SSLogo.png" alt="SSLogo" className="logo" />
+            </Link>
+            <div className="buttons">
+              <Link href="/login">
+                <Button className="loginButton">로그인</Button>
+              </Link>
+            </div>
+          </header>
+          <hr className="separator"/>
             {children}
         </NextUIProvider>
       </body>

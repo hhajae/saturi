@@ -5,7 +5,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    background-image: url('/background.jpg');
+    /* background-image: url('/background.jpg'); */
     background-size: cover;
     background-position: center;
     color: #fff;
@@ -15,27 +15,11 @@
     box-sizing: border-box; /* Include padding in the width calculation */
     margin: 0 auto; /* Center the container */
   }
-  
-  .header {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    /* padding: 20px; */
-  }
-  
-  .logo {
-    width: 120px;
-  }
 
   .logo2 {
-    width: 90%;
-    height: 90%;
+    width: 30%;
+    height: 30%;
   }
-  
-  /* .buttons {
-    display: flex;
-    gap: 10px;
-  } */
   
   .loginButton, .signupButton {
     padding: 10px 20px;
@@ -95,12 +79,6 @@
     cursor: pointer;
   }
 
-  .separator {
-    width: 100%;
-    border: 2px solid black; 
-    /* margin: 20px 0; */
-  }
-
   .intro {
     margin-top: 40px; /* Margin to separate from the content */
     /* padding: 250px; */
@@ -121,64 +99,65 @@
   }
 
   .bottom {
+    display: contents;
     color: black;
-    text-align: center;
+    /* text-align: center; */
+    justify-content: center;
     font-weight: bold;
     font-size: 30px;
-    margin: auto;
   }
 
-  /* Styling for the FAQ section */
-.faq {
-  margin-top: 40px;
-  width: 100%;
-  max-width: 800px; /* Center the FAQ container with a max width */
-  display: flex;
-  flex-direction: column;
-  align-items: center; /* Center align the items within the container */
-  color: black;
-}
+    /* Styling for the FAQ section */
+  .faq {
+    margin-top: 80px;
+    width: 100%;
+    max-width: 800px; /* Center the FAQ container with a max width */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center align the items within the container */
+    color: black;
+  }
 
-.faq h2 {
-  font-size: 3rem;
-  margin-bottom: 20px;
-  text-align: center;
-}
+  .faq h2 {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
 
-.faq-item {
-  background-color: #e4d0a2;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  padding: 10px 20px;
-  width: 100%; /* Make the FAQ items take full width of the container */
-}
+  .faq-item {
+    background-color: #e4d0a2;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px 20px;
+    width: 100%; /* Make the FAQ items take full width of the container */
+  }
 
-.faq-question {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  padding: 10px 0;
-  font-size: 1.5rem;
-}
+  .faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 0;
+    font-size: 1.5rem;
+  }
 
-.faq-question h3 {
-  margin: 0;
-  font-size: 1.5rem;
-}
+  .faq-question h3 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
 
-.faq-answer {
-  display: none;
-  padding: 10px 0;
-}
+  .faq-answer {
+    display: none;
+    padding: 10px 0;
+  }
 
-.faq-answer p {
-  margin: 0;
-  font-size: 1.2rem;
-  font-weight: bold;
-}
+  .faq-answer p {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
 
-/* Show answer when item is active */
-.faq-item.active .faq-answer {
-  display: block;
-}
+  /* Show answer when item is active */
+  .faq-item.active .faq-answer {
+    display: block;
+  }

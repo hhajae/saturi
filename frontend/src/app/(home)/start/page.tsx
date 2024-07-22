@@ -38,24 +38,7 @@ export default function Start() {
   ]
 
   return (
-    <div className="container">
-      {/* <Head>
-        <title>Netflix Onboarding</title>
-        <meta name="description" content="Netflix-style onboarding page" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head> */}
-
-      <header className="header">
-        <img src="/SSLogo.png" alt="SSLogo" className="logo" />
-        <div className="buttons">
-          <Link href="/login">
-            <Button className="loginButton">로그인</Button>
-          </Link>
-        </div>
-      </header>
-
-      <hr className="separator"/>
-      
+    <div className="container">      
       <main className="main">
         <div className="content">
           <h1 className="title">실시간 음성 분석, 채팅으로</h1>

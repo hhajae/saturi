@@ -1,3 +1,36 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px;
+  }
+
+.logo {
+width: 120px;
+}
+
+.loginButton, .signupButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+  
+.loginButton {
+background-color: #99de83;
+color: white;
+height: 50px;
+margin-right: 10px;
+}
+
+.separator {
+    width: 100%;
+    border: 1px solid black; 
+    /* margin: 20px 0; */
+  }
