@@ -74,10 +74,10 @@ public class UserService {
 
     private static UserEntity createNewUser(UserRegisterRequestDTO request) {
         UserEntity user = new UserEntity();
-        // TODO 생성자로 생성하기
         user.setEmail(request.getEmail());
         user.setPassword(PasswordEncoder.encrypt(request.getEmail(), request.getPassword()));
         user.setNickname(request.getNickname());
+        user.getLocation().setLocationId(request.getLocationId());
         user.setGender(request.getGender());
         user.setAgeRange(request.getAgeRange());
         user.setRegDate(LocalDateTime.now());
@@ -126,16 +126,16 @@ public class UserService {
      * 회원 수정
      */
     @Transactional
-    public UserMsgResponseDTO updateUser(UserUpdateRequestDTO request) {
+    public UserMsgResponseDTO updateUser(Long userId, UserUpdateRequestDTO request) {
         validateDuplicateUserNickname(request.getNickname());
-        UserEntity findUser = userRepository.findByUserId(request.getUserId()).get();
-        changeUserInfo(findUser, request.getNickname(), request.getLocation(), request.getGender(), request.getRole());
+        UserEntity findUser = userRepository.findByUserId(userId).get();
+        changeUserInfo(findUser, request.getNickname(), request.getLocationId(), request.getGender(), request.getRole());
         return new UserMsgResponseDTO("회원 수정 완료");
     }
 
-    private void changeUserInfo(UserEntity findUser, String nickname, Location location, Gender gender, Role role) {
+    private void changeUserInfo(UserEntity findUser, String nickname, Long locationId, Gender gender, Role role) {
         findUser.setNickname(nickname);
-        findUser.setLocation(location);
+        findUser.getLocation().setLocationId(locationId);
         findUser.setGender(gender);
         findUser.setRole(role);
     }
@@ -144,12 +144,12 @@ public class UserService {
      * 일반회원 비밀번호 변경
      */
     @Transactional
-    public UserPasswordUpdateResponseDTO updateUserPassword(UserPasswordUpdateRequestDTO request) {
-        UserEntity findUser = userRepository.findByUserId(request.getUserId()).get();
+    public UserMsgResponseDTO updateUserPassword(Long userId, UserPasswordUpdateRequestDTO request) {
+        UserEntity findUser = userRepository.findByUserId(userId).get();
         validateCorrectCurrentPassword(request.getCurrentPassword(), findUser); // 현재 비밀번호 검증
         validateCheckNewPassword(request.getNewPassword(), findUser); // 현재, 새로운 비밀번호 동일 여부 검증
         findUser.setPassword(PasswordEncoder.encrypt(findUser.getEmail(), request.getNewPassword()));
-        return new UserPasswordUpdateResponseDTO(findUser.getUserId());
+        return new UserMsgResponseDTO("ok");
     }
 
     private static void validateCorrectCurrentPassword(String currentPassword, UserEntity findUser) {
@@ -236,11 +236,6 @@ public class UserService {
         UserEntity findUser = userRepository.findByUserId(userId).get();
         return new UserInfoResponseDTO(findUser.getUserId(), findUser.getEmail(), findUser.getNickname(), findUser.getRegDate(),
                 findUser.getExp(), findUser.getGender(), findUser.getRole(), findUser.getAgeRange(), findUser.getQuokka());
-    }
-
-    public Long getUserIdByToken() {
-        //TODO 토큰 디코딩 필요
-        return null;
     }
 
 
