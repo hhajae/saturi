@@ -2,12 +2,17 @@ package com.tunapearl.saturi.repository;
 
 
 import com.tunapearl.saturi.domain.user.UserEntity;
+import com.tunapearl.saturi.domain.UserEntity;
+
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+
 @Repository
 @RequiredArgsConstructor
 public class UserRepository {
@@ -53,12 +58,4 @@ public class UserRepository {
                 em.createQuery("select u from UserEntity u", UserEntity.class)
                 .getResultList());
     }
-
-    /**
-     * 회원 삭제
-     */
-//    public UserDeleteResponseDTO deleteUser(UserDeleteRequestDTO request) {
-//
-//    }
 }
-
