@@ -1,6 +1,7 @@
 package com.tunapearl.saturi.service;
 
-import com.tunapearl.saturi.dto.*;
+import com.tunapearl.saturi.dto.user.UserLoginRequestDTO;
+import com.tunapearl.saturi.dto.user.UserType;
 import com.tunapearl.saturi.dto.user.social.*;
 import com.tunapearl.saturi.exception.InvalidTokenException;
 import com.tunapearl.saturi.repository.UserRepository;
@@ -36,7 +37,7 @@ public class SocialUserService {
     BasicJsonParser parser = new BasicJsonParser();
     StringTokenizer st;
 
-    public LoginResponse doSocialLogin(SocialLoginRequest request) {
+    public LoginResponse doSocialLogin(UserLoginRequestDTO request) {
 
         // 유저가 로그인 한 방식 식별
         LoginService loginService = getLoginService(request.getUserType());

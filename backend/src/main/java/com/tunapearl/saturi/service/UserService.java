@@ -90,9 +90,9 @@ public class UserService {
         validateAuthenticateUser(findUsers); // 아이디, 비밀번호 일치 여부 검증
         UserEntity findUser = findUsers.get(0);
         validateDeletedUser(findUser); // 탈퇴회원 검증
+
         //TODO JWT 토큰 발급
-        return new UserLoginResponseDTO(findUser.getUserId(), findUser.getEmail(), findUser.getNickname(), findUser.getRegDate(),
-                findUser.getExp(), findUser.getGender(), findUser.getRole(), findUser.getAgeRange(), findUser.getQuokka());
+        return UserLoginResponseDTO.builder().build();
     }
 
     private static void validateDeletedUser(UserEntity user) {

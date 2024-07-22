@@ -3,7 +3,6 @@ package com.tunapearl.saturi.controller;
 import com.tunapearl.saturi.domain.user.UserEntity;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.dto.user.social.LoginResponse;
-import com.tunapearl.saturi.dto.user.social.SocialLoginRequest;
 import com.tunapearl.saturi.service.SocialUserService;
 import com.tunapearl.saturi.service.UserService;
 
