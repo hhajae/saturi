@@ -2,6 +2,8 @@ package com.tunapearl.saturi.controller;
 
 import com.tunapearl.saturi.domain.user.UserEntity;
 import com.tunapearl.saturi.dto.user.*;
+import com.tunapearl.saturi.dto.user.social.LoginResponse;
+import com.tunapearl.saturi.dto.user.social.SocialLoginRequest;
 import com.tunapearl.saturi.service.SocialUserService;
 import com.tunapearl.saturi.service.UserService;
 
@@ -29,6 +31,10 @@ public class UserController {
      */
     @PostMapping("/auth")
     public ResponseEntity<UserMsgResponseDTO> userRegister(@RequestBody @Valid UserRegisterRequestDTO request) {
+        //TODO: 일반, 소셜 로그인 분리하기
+        //log.info("Received social login request for {}", request.getCode());
+        //return ResponseEntity.created(URI.create("/auth/login")).body(userService.doSocialLogin(request));
+
         log.info("Received normal user register request for {}", request.getEmail());
         return ResponseEntity.created(URI.create("/auth")).body(userService.registerUser(request));
     }
@@ -119,41 +125,13 @@ public class UserController {
      * 이메일 인증번호 인증
      */
     @PostMapping("/auth/email-valid-code")
-    public ResponseEntity<String> emailAuthCheck(@RequestBody @Valid EmailCheckDTO request){
+    public ResponseEntity<String> emailAuthCheck(@RequestBody @Valid EmailCheckDTO request) {
         //FIXME exception 수정 필요, 반환 타입 수정 필요
         log.info("Received normal user email auth check request for {}", request.getEmail());
-        if(userService.checkAuthNum(request.getEmail(),request.getAuthNum())) {
+        if (userService.checkAuthNum(request.getEmail(), request.getAuthNum())) {
             return ResponseEntity.ok().body("ok");
-        }
-        else{
+        } else {
             throw new NullPointerException("error!");
         }
-@RequestMapping("/user")
-@RequiredArgsConstructor
-public class UserController {
-    private final SocialUserService userService;
-
-    @PostMapping("/auth/login")
-    public ResponseEntity<LoginResponse> doSocialLogin(@RequestBody @Valid SocialLoginRequest request) {
-        // TODO: Implement social login logic
-        log.info("Received social login request for {}", request.getCode());
-        return ResponseEntity.created(URI.create("/auth/login")).body(userService.doSocialLogin(request));
-    }
-
-    @GetMapping("/temp")
-    public ResponseEntity<String> doSocialLogin() {
-        String[] propertyKeys = {"kakao_account.profile", "kakao_account.name", "kakao_account.email", "kakao_account.age_range", "kakao_account.birthday", "kakao_account.gender"};
-        // propertyKeys 배열 형식의 스트링으로 변환
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (int i = 0; i < propertyKeys.length; i++) {
-            sb.append("\"" + propertyKeys[i] + "\"");
-            if (i < propertyKeys.length - 1) {
-                sb.append(",");
-            } else {
-                sb.append("]");
-            }
-        }
-        return ResponseEntity.ok(sb.toString());
     }
 }

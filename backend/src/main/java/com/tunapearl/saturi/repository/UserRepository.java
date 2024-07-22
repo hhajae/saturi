@@ -1,12 +1,7 @@
 package com.tunapearl.saturi.repository;
 
-
 import com.tunapearl.saturi.domain.user.UserEntity;
-import com.tunapearl.saturi.domain.UserEntity;
-
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -42,7 +37,6 @@ public class UserRepository {
                 .setParameter("nickname", nickname)
                 .getResultList());
     }
-
 
     public Optional<List<UserEntity>> findByEmailAndPassword(String email, String password) {
         return Optional.ofNullable(em.createQuery(
