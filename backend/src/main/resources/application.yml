@@ -5,15 +5,6 @@ spring:
     password: ssafy
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  config:
-    import:
-      - classpath:/yaml/application-api-key.yml
-      - classpath:/yaml/application-log.yml
-    profiles:
-      group:
-        logging: api-key, log
-      active: logging
-
   jpa:
     hibernate:
       ddl-auto: update # 또는 필요에 따라 create, create-drop, validate로 변경

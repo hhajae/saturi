@@ -47,18 +47,13 @@ public class UserService {
         SocialAuthResponse authResponse = loginService.getAccessToken(request.getCode());
 
         // 토큰 유효성 검사
+
         checkTokenPayload(authResponse.getIdToken());
         checkTokenSignature(authResponse.getIdToken());
 
         // 유저 개인 정보 얻기
         SocialUserResponse userResponse = loginService.getUserInfo(authResponse.getAccessToken());
         log.info("User info: {}", userResponse);
-
-        // DB에 저장되지 않은 유저라면 회원가입
-        Optional<UserEntity> user = userRepository.findByUserId(userResponse.getUserId());
-        if(user.isEmpty()) {
-            //TODO: 회원가입 or 회원이 아니다. 처리
-        }
 
         // TODO: 실제 유저 정보로 바꿔야함
         return LoginResponse.builder().id(1L).build();
