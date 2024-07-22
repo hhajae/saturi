@@ -4,15 +4,31 @@ spring:
     username: ssafy
     password: ssafy
     driver-class-name: com.mysql.cj.jdbc.Driver
-
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: gkwo7108@gmail.com
+    password: nqubrrxufkoexsgy
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 50000
+    auth-code-expiration-millis: 1800000
   jpa:
     hibernate:
-      ddl-auto: update # 또는 필요에 따라 create, create-drop, validate로 변경
+      ddl-auto: create # 또는 필요에 따라 create, create-drop, validate로 변경
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-        show_sql: true
+#        show_sql: true
         format_sql: true
+        default_batch_fetch_size: 100 # fetch join 후 지연로딩하는 entity을 in 절로 미리 영속성 컨텍스트에 저장
 
   # 선택사항: Hibernate 통계 정보 활성화
   # hibernate:
