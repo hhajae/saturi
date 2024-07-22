@@ -20,20 +20,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URI;
 import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KakaoLoginServiceImpl implements LoginService {
+public class KakaoLoginServiceImpl implements SocialLoginService {
     private final RestTemplate restTemplate;
     private MultiValueMap<String, String> body;
     private Map<String, AgeRange> ageMap;
 
-    @Value("${social.client.kakao.grant-type}")
+    @Value("${social.client.kakao.grant-type-read}")
     private String grantType;
     @Value("${social.client.kakao.client-id}")
     private String clientId;
