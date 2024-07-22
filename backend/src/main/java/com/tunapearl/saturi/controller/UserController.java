@@ -2,6 +2,7 @@ package com.tunapearl.saturi.controller;
 
 import com.tunapearl.saturi.domain.*;
 import com.tunapearl.saturi.dto.*;
+import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.*;
 import com.tunapearl.saturi.service.*;
 import com.tunapearl.saturi.utils.*;
@@ -27,6 +28,8 @@ import java.net.URI;
 public class UserController {
 
     private final UserService userService;
+    private final JWTUtil jwtUtil;
+    private final TokenService tokenService;
 
     /**
      * 일반회원 회원가입
@@ -220,4 +223,5 @@ public class UserController {
             status = HttpStatus.UNAUTHORIZED;
         }
         return new ResponseEntity<Map<String, Object>>(resultMap, status);
+    }
 }
