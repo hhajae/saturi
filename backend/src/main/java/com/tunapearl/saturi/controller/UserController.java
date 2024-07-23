@@ -1,5 +1,6 @@
 package com.tunapearl.saturi.controller;
 
+
 import com.tunapearl.saturi.domain.*;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.*;
@@ -15,8 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.net.URI;
 
 @Slf4j
@@ -65,12 +64,7 @@ public class UserController {
      */
     @PostMapping("/auth/login")
     public ResponseEntity<UserLoginResponseDTO> userLogin(@RequestBody @Valid UserLoginRequestDTO request) {
-        //TODO: 일반, 소셜 로그인 분리하기
-
         if(request.getUserType() == UserType.NORMAL){
-            //TODO: JWT 서비스로 이동(login, , )
-            // String accessToken= jwtUtil.createAccessToken(user.getUserId());
-            // String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
             log.info("Received normal user login request for {}", request.getEmail());
             return ResponseEntity.ok().body(userService.loginUser(request));
         }
@@ -80,41 +74,25 @@ public class UserController {
         }
     }
 
+    /**
+     * 로그아웃
+     */
     @GetMapping("/logout")
-    public ResponseEntity<Map<String,Object>> logout(HttpServletRequest request) throws Exception {
-        Map<String, Object> resultMap = new HashMap<>();
-        HttpStatus status = HttpStatus.ACCEPTED;
+    public ResponseEntity<String> logout(HttpServletRequest request) throws Exception, UnAuthorizedException {
+        String accessToken = request.getHeader("accessToken");
+        log.info("Received normal user logout request for {}", accessToken);
 
-        //TODO: 1.header에서 accessToken 받아오기
-        //TODO: 2.accessToken으로 사용자 Id 가져오기 jwtUtil.getUserId이용
-        //TODO: 3.tokenService.deleteRefreshToken(userId)로 refreshToken 삭제하기
-
-        String accessToken = request.getHeader("access-token");
-
-        try {
-
-            tokenService.deleteRefreshToken(jwtUtil.getUserId(accessToken));
-
-            status = HttpStatus.OK;
-        } catch (Exception e) {
-            log.error("로그아웃 실패 : {}", e);
-            resultMap.put("message", e.getMessage());
-            status = HttpStatus.INTERNAL_SERVER_ERROR;
-        } catch (UnAuthorizedException e) {
-            throw new RuntimeException(e);
-        }
-        return new ResponseEntity<Map<String, Object>>(resultMap, status);
-
+        userService.logoutUser(accessToken);
+        return ResponseEntity.ok().body("ok");
     }
 
     /**
      * 회원 프로필 조회
      */
     @GetMapping("/auth/profile")
-    public ResponseEntity<UserInfoResponseDTO> userProfile(@RequestBody @Valid UserInfoRequestDTO request) {
-        log.info("Received user profile info request for {}", request.getToken());
-        //TODO 토큰 디코딩해서 id 빼기
-        Long userId = userService.getUserIdByToken();
+    public ResponseEntity<UserInfoResponseDTO> userProfile(@RequestHeader("accessToken") String authorization) throws UnAuthorizedException {
+        Long userId = jwtUtil.getUserId(authorization);
+        log.info("Received user profile info request for {}", userId);
         return ResponseEntity.ok().body(userService.getUserProfile(userId));
     }
 
@@ -122,27 +100,35 @@ public class UserController {
      * 회원 수정
      */
     @PutMapping("/auth")
-    public ResponseEntity<UserMsgResponseDTO> userUpdate(@RequestBody @Valid UserUpdateRequestDTO request) {
-        log.info("Received user update request for {}", request.getUserId());
-        return ResponseEntity.ok().body(userService.updateUser(request));
+    public ResponseEntity<UserMsgResponseDTO> userUpdate(@RequestHeader("accessToken") String authorization,
+                                                         @RequestBody @Valid UserUpdateRequestDTO request) throws UnAuthorizedException {
+        Long userId = jwtUtil.getUserId(authorization);
+        log.info("Received user update request for {}", userId);
+        return ResponseEntity.ok().body(userService.updateUser(userId, request));
     }
 
     /**
      * 회원 비밀번호 변경
      */
     @PutMapping("/auth/password-update")
-    public ResponseEntity<UserPasswordUpdateResponseDTO> userUpdatePassword(@RequestBody @Valid UserPasswordUpdateRequestDTO request) {
-        log.info("Received normal user password update request for {}", request.getUserId());
-        return ResponseEntity.ok().body(userService.updateUserPassword(request));
+    public ResponseEntity<UserMsgResponseDTO> userUpdatePassword(@RequestHeader("accessToken") String authorization,
+                                                                 @RequestBody @Valid UserPasswordUpdateRequestDTO request) throws UnAuthorizedException {
+        Long userId = jwtUtil.getUserId(authorization);
+        log.info("Received user password update request for {}", userId);
+        return ResponseEntity.ok().body(userService.updateUserPassword(userId, request));
     }
 
     /**
      * 회원 삭제(DB 삭제 x, 회원탈퇴 상태로 변경)
      */
     @DeleteMapping("/auth")
-    public ResponseEntity<UserMsgResponseDTO> userDelete(@RequestBody @Valid UserDeleteRequestDTO request) {
-        log.info("Received normal user delete request for {}", request.getUserId());
-        return ResponseEntity.ok().body(userService.deleteUser(request.getUserId()));
+    public ResponseEntity<UserMsgResponseDTO> userDelete(@RequestHeader("accessToken") String authorization) throws Exception, UnAuthorizedException {
+        Long userId = jwtUtil.getUserId(authorization);
+        log.info("Received user delete request for {}", userId);
+
+        tokenService.deleteRefreshToken(userId); // 토큰 삭제
+
+        return ResponseEntity.ok().body(userService.deleteUser(userId));
     }
 
 
@@ -174,57 +160,44 @@ public class UserController {
         }
     }
 
-    //accessToken 의 유효성 검사
-    @GetMapping("/token-check")
-    public ResponseEntity<Map<String,Object>> checkToken(HttpServletRequest request) throws Exception{
-        Map<String, Object> resultMap = new HashMap<>();
-        HttpStatus status = HttpStatus.ACCEPTED;
+    /**
+     * accessToken 유효성 검사
+     */
+    @GetMapping("/auth/token-check")
+    public ResponseEntity<String> checkToken(HttpServletRequest request) throws Exception {
 
         if (jwtUtil.checkToken(request.getHeader("Authorization"))) {
-            log.info("사용 가능한 토큰!!!");
             try {
+                //FIXME: 반환DTO 수정 필요
+                return ResponseEntity.ok().body("ok");
 
-                //TODO: 로그인 사용자 정보 resultMap에 저장
-
-                status = HttpStatus.OK;
             } catch (Exception e) {
-                log.error("정보조회 실패 : {}", e);
-                resultMap.put("message", e.getMessage());
-                status = HttpStatus.INTERNAL_SERVER_ERROR;
+                return ResponseEntity.internalServerError().body("Internal Server Error");
             }
         } else {
-            log.error("사용 불가능 토큰!!!");
-            status = HttpStatus.UNAUTHORIZED;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return new ResponseEntity<Map<String, Object>>(resultMap, status);
     }
 
-    //accessToken 재발급
-    @PostMapping("/token-refresh")
-    public ResponseEntity<?> refreshToken(@RequestBody User user, HttpServletRequest request)
+    /**
+     * accessToken 재발급
+     */
+    @PostMapping("/auth/token-refresh")
+    public ResponseEntity<TokenRefreshResponseDTO> refreshToken(@RequestBody TokenRefreshRequestDTO tokenrefreshrequestdto, HttpServletRequest request)
             throws Exception {
-        Map<String, Object> resultMap = new HashMap<>();
-        HttpStatus status = HttpStatus.ACCEPTED;
 
-        //TODO: 1.header에서 refreshToken 받아오기
-        //TODO: refreshToken값 가져와서 db와 비교할 것
+        String refreshToken = request.getHeader("refreshToken");
 
-        String refreshToken = request.getHeader("refresh-token");
-//        log.debug("refresh-token : {}, user : {}", token, user);
         if (jwtUtil.checkToken(refreshToken)) {
-            if (refreshToken.equals(tokenService.getRefreshToken(user.getUserId()))) {
-                String accessToken = jwtUtil.createAccessToken(user.getUserId());
+            if (refreshToken.equals(tokenService.getRefreshToken(tokenrefreshrequestdto.getUserId()))) {
 
-//                log.debug("정상적으로 access token 재발급!!!");
-                log.info("access-token : {}", accessToken);
-
-                resultMap.put("access-token", accessToken);
-                status = HttpStatus.CREATED;
+                String accessToken = jwtUtil.createAccessToken(tokenrefreshrequestdto.getUserId());
+                return ResponseEntity.ok().body(new TokenRefreshResponseDTO(accessToken));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         } else {
-            log.debug("refresh token도 사용 불가!!!!!!!");
-            status = HttpStatus.UNAUTHORIZED;
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return new ResponseEntity<Map<String, Object>>(resultMap, status);
     }
 }

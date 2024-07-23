@@ -11,6 +11,7 @@ public class UserRegisterRequestDTO {
     private String email;
     private String password;
     private String nickname;
+    private Long locationId;
     private Gender gender;
     private AgeRange ageRange;
 }
