@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
@@ -26,16 +25,16 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class NaverLoginServiceImpl implements SocialLoginService {
-    
+
     // 스프링부트 빈 DI
     private final RestTemplate restTemplate;
     private final Map<String, AgeRange> ageRanges;
-    
+
     // 내가 생성
     private MultiValueMap<String, String> body;
 
     // yml 설정 파일 주입
-    @Value("${social.client.naver.grant-type-read}")
+    @Value("${social.client.naver.grant-type}")
     private String grantType;
     @Value("${social.client.naver.client-id}")
     private String clientId;
@@ -70,7 +69,7 @@ public class NaverLoginServiceImpl implements SocialLoginService {
 
         // 요청
         SocialAuthResponse response = restTemplate.getForObject(uri, SocialAuthResponse.class);
-        
+
         //로깅
         log.info("Naver Access Token: {}", response.toString());
         return response;
@@ -82,8 +81,8 @@ public class NaverLoginServiceImpl implements SocialLoginService {
     }
 
     @Override
-    public void refreshAccessToken(String refreshToken) {
-
+    public SocialAuthResponse refreshAccessToken(String refreshToken) {
+        return null;
     }
 
     @Override

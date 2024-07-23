@@ -34,10 +34,12 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
 
     // 내가 생성
     private MultiValueMap<String, String> body;
-    
+
     // yml 설정 파일에서 주입
-    @Value("${social.client.kakao.grant-type-read}")
+    @Value("${social.client.kakao.grant-type}")
     private String grantType;
+    @Value("${social.client.kakao.grant-type-refresh}")
+    private String grantTypeRefresh;
     @Value("${social.client.kakao.client-id}")
     private String clientId;
     @Value("${social.client.kakao.redirect-uri}")
@@ -122,8 +124,31 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
     }
 
     @Override
-    public void refreshAccessToken(String refreshToken) {
+    public SocialAuthResponse refreshAccessToken(String refreshToken) {
+        String url = "https://kauth.kakao.com/oauth/token";
 
+        //헤더 셋팅
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf("pplication/x-www-form-urlencoded;charset=utf-8"));
+
+        //바디 셋팅
+        MultiValueMap<String, String> refreshBody = new LinkedMultiValueMap<>();
+        body.add("grant_type", grantTypeRefresh);
+        body.add("client_id", clientId);
+        body.add("refresh_token", refreshToken);
+        body.add("client_secret", clientSecret);
+
+        //요청
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(refreshBody, headers);
+        ResponseEntity<SocialAuthResponse> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                requestEntity,
+                SocialAuthResponse.class
+        );
+
+        //응답
+        return response.getBody();
     }
 
     @Override

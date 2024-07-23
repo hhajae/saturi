@@ -10,9 +10,7 @@ import com.tunapearl.saturi.exception.InvalidTokenException;
 import com.tunapearl.saturi.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.json.BasicJsonParser;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -23,34 +21,35 @@ import java.util.*;
 public class SocialUserService {
 
     /* 카카오 로그인, 네이버 로그인 Service 리스트*/
-    private final List<SocialLoginService> loginServices;
+    private final List<SocialLoginService> socialLoginServices;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     public UserLoginResponseDTO doSocialLogin(UserLoginRequestDTO request) {
 
         // 유저가 로그인 한 방식 식별
-        SocialLoginService loginService = getLoginService(request.getUserType());
+        SocialLoginService socialLoginService = getLoginService(request.getUserType());
 
         // 유저 토큰 정보 얻기
-        SocialAuthResponse authResponse = loginService.getAccessToken(request.getCode());
+        SocialAuthResponse authResponse = socialLoginService.getAccessToken(request.getCode());
 
         // 토큰 유효성 검사
         try {
-            loginService.checkTokenValidity(authResponse.getAccessToken());
+            socialLoginService.checkTokenValidity(authResponse.getAccessToken());
         }
-        catch (InvalidTokenException e) {
-            //TODO: 토큰 갱신 필요(refresh)
-            e.getStackTrace();
+        catch (InvalidTokenException e) { //토큰 갱신
+            authResponse = socialLoginService.refreshAccessToken(authResponse.getRefreshToken());
+            log.info("Refresh access token: {}", authResponse.toString());
         }
         catch (RuntimeException e) {
             e.getStackTrace();
         }
 
         // 유저 개인 정보 얻기
-        SocialUserResponse userResponse = loginService.getUserInfo(authResponse.getAccessToken());
+        SocialUserResponse userResponse = socialLoginService.getUserInfo(authResponse.getAccessToken());
         log.info("User Response: {}", userResponse);
 
-        if(loginService instanceof NaverLoginServiceImpl){
+        if(socialLoginService instanceof NaverLoginServiceImpl){
             log.info("Naver login request Here");
             return UserLoginResponseDTO.builder().build();
         }
@@ -74,7 +73,7 @@ public class SocialUserService {
 
     /* 여러 로그인 서비스 API 중에 어떤 서비스인지 확인하는 메서드 */
     private SocialLoginService getLoginService(UserType type){
-        for(SocialLoginService loginService: loginServices){
+        for(SocialLoginService loginService: socialLoginServices){
             if(loginService.getServiceName().equals(type)){
                 log.info("Selected login service: {}", loginService.getServiceName());
                 return loginService;
