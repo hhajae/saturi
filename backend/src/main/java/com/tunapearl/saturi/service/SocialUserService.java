@@ -24,6 +24,7 @@ public class SocialUserService {
     private final List<SocialLoginService> socialLoginServices;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final TokenService tokenService;
 
     public UserLoginResponseDTO doSocialLogin(UserLoginRequestDTO request) {
 
@@ -64,13 +65,9 @@ public class SocialUserService {
             userId = user.get().get(0).getUserId();
         }
 
-        //TODO: 회원 엔티티로 JWT 생성
+        //회원 엔티티로 JWT 생성, 반환
         log.info("User Entity: {}", userId);
-
-        // TODO: 생성된 JWT 토큰 반환
-        return UserLoginResponseDTO.builder().build();
-
-        //tokenService.saveRefreshToken(findUser.getUserId());
+        return tokenService.saveRefreshToken(userId);
     }
 
     /* 여러 로그인 서비스 API 중에 어떤 서비스인지 확인하는 메서드 */
