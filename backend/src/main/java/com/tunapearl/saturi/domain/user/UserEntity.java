@@ -18,7 +18,7 @@ public class UserEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id")
     private LocationEntity location;
 
@@ -49,7 +49,7 @@ public class UserEntity {
 
     private Boolean isDeleted = false;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "quokka_id")
     private QuokkaEntity quokka;
 
