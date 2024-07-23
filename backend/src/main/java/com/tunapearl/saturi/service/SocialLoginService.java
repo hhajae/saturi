@@ -9,5 +9,6 @@ public interface SocialLoginService {
     UserType getServiceName();
     SocialAuthResponse getAccessToken(String code);
     void checkTokenValidity(String accessToken) throws InvalidTokenException, RuntimeException;
+    void refreshAccessToken(String refreshToken);
     SocialUserResponse getUserInfo(String accessToken);
 }

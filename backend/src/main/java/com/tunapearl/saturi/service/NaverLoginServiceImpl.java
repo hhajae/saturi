@@ -82,6 +82,11 @@ public class NaverLoginServiceImpl implements SocialLoginService {
     }
 
     @Override
+    public void refreshAccessToken(String refreshToken) {
+
+    }
+
+    @Override
     public SocialUserResponse getUserInfo(String accessToken) {
 
         String url = "https://openapi.naver.com/v1/nid/me";

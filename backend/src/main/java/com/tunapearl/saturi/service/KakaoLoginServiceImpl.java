@@ -122,6 +122,11 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
     }
 
     @Override
+    public void refreshAccessToken(String refreshToken) {
+
+    }
+
+    @Override
     public SocialUserResponse getUserInfo(String accessToken) {
 
         //쿼리 파라미터 & URI 셋팅
