@@ -166,15 +166,15 @@ public class UserService {
     public UserMsgResponseDTO updateUser(Long userId, UserUpdateRequestDTO request) {
         validateDuplicateUserNickname(request.getNickname());
         UserEntity findUser = userRepository.findByUserId(userId).get();
-        changeUserInfo(findUser, request.getNickname(), request.getLocationId(), request.getGender(), request.getRole());
+        changeUserInfo(findUser, request.getNickname(), request.getLocationId(), request.getGender(), request.getAgeRange());
         return new UserMsgResponseDTO("회원 수정 완료");
     }
 
-    private void changeUserInfo(UserEntity findUser, String nickname, Long locationId, Gender gender, Role role) {
+    private void changeUserInfo(UserEntity findUser, String nickname, Long locationId, Gender gender, AgeRange ageRange) {
         findUser.setNickname(nickname);
         findUser.getLocation().setLocationId(locationId);
         findUser.setGender(gender);
-        findUser.setRole(role);
+        findUser.setAgeRange(ageRange);
     }
 
     /**
