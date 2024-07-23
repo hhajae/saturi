@@ -57,17 +57,15 @@ public class UserService {
     }
 
     public void validateDuplicateUserEmail(String email) {
-        List<UserEntity> findUsers = userRepository.findByEmail(email).get();
-        if (!findUsers.isEmpty()) {
-//            throw new IllegalStateException("이미 존재하는 회원입니다.");
+        Optional<List<UserEntity>> findUsers = userRepository.findByEmail(email);
+        if (findUsers.isPresent()) {
             throw new DuplicatedUserEmailException("이미 존재하는 회원입니다.");
         }
     }
 
     public void validateDuplicateUserNickname(String nickname) {
-        List<UserEntity> findUsers = userRepository.findByNickname(nickname).get();
-        if (!findUsers.isEmpty()) {
-//            throw new IllegalStateException("이미 존재하는 닉네임입니다.");
+        Optional<List<UserEntity>> findUsers = userRepository.findByNickname(nickname);
+        if (findUsers.isPresent()) {
             throw new DuplicatedUserNicknameException("이미 존재하는 닉네임입니다.");
         }
     }
@@ -77,7 +75,8 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPassword(PasswordEncoder.encrypt(request.getEmail(), request.getPassword()));
         user.setNickname(request.getNickname());
-        user.getLocation().setLocationId(request.getLocationId());
+        //TODO location data 추가 후 테스트 시도
+//        user.getLocation().setLocationId(request.getLocationId());
         user.setGender(request.getGender());
         user.setAgeRange(request.getAgeRange());
         user.setRegDate(LocalDateTime.now());
