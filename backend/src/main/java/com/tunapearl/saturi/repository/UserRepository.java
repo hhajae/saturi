@@ -33,11 +33,12 @@ public class UserRepository {
     }
 
     public Optional<List<UserEntity>> findByNickname(String nickname) {
-        return Optional.ofNullable(em.createQuery(
-                "select u from UserEntity u" +
-                        " where u.nickname = :nickname", UserEntity.class)
+        List<UserEntity> results = em.createQuery("select u from UserEntity u where u.nickname = :nickname", UserEntity.class)
                 .setParameter("nickname", nickname)
-                .getResultList());
+                .getResultList();
+
+        // 결과 리스트가 비어 있는 경우 Optional.empty() 반환
+        return results.isEmpty() ? Optional.empty() : Optional.of(results);
     }
 
     public Optional<List<UserEntity>> findByEmailAndPassword(String email, String password) {
