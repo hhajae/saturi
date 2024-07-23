@@ -8,6 +8,7 @@ import com.tunapearl.saturi.dto.user.UserType;
 import com.tunapearl.saturi.dto.user.social.*;
 import com.tunapearl.saturi.exception.InvalidTokenException;
 import com.tunapearl.saturi.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class SocialUserService {
     private final UserService userService;
     private final TokenService tokenService;
 
+    @Transactional
     public UserLoginResponseDTO doSocialLogin(UserLoginRequestDTO request) {
 
         // 유저가 로그인 한 방식 식별
@@ -49,11 +51,6 @@ public class SocialUserService {
         // 유저 개인 정보 얻기
         SocialUserResponse userResponse = socialLoginService.getUserInfo(authResponse.getAccessToken());
         log.info("User Response: {}", userResponse);
-
-        if(socialLoginService instanceof NaverLoginServiceImpl){
-            log.info("Naver login request Here");
-            return UserLoginResponseDTO.builder().build();
-        }
 
         // 기존재 하던 계정인지 검사
         Optional<List<UserEntity>> user = userRepository.findByEmail(userResponse.getEmail());
