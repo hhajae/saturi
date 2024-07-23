@@ -29,15 +29,6 @@ public class UserController {
     private final JWTUtil jwtUtil;
     private final TokenService tokenService;
 
-    @GetMapping("/test")
-    public ResponseEntity<UserLoginResponseDTO> test(@RequestBody UserLoginRequestDTO request){
-//        Long userId=12345678L;
-        return ResponseEntity.ok().body(userService.loginUser(request));
-
-//        log.info("getRefreshToken:{}",tokenService.getRefreshToken(userId));
-//        tokenService.deleteRefreshToken(userId);
-    }
-
 
     /**
      * 일반회원 회원가입

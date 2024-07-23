@@ -178,6 +178,7 @@ public class UserService {
     public UserMsgResponseDTO updateUserPassword(Long userId, UserPasswordUpdateRequestDTO request) {
         UserEntity findUser = userRepository.findByUserId(userId).get();
         validateCorrectCurrentPassword(request.getCurrentPassword(), findUser); // 현재 비밀번호 검증
+        validatePassword(request.getNewPassword());
         validateCheckNewPassword(request.getNewPassword(), findUser); // 현재, 새로운 비밀번호 동일 여부 검증
         findUser.setPassword(PasswordEncoder.encrypt(findUser.getEmail(), request.getNewPassword()));
         return new UserMsgResponseDTO("ok");
@@ -206,6 +207,7 @@ public class UserService {
     }
 
     private void changeUserDeleteStatus(UserEntity findUser) {
+        findUser.setEmail(null);
         findUser.setDeletedDt(LocalDateTime.now());
         findUser.setIsDeleted(true);
     }
