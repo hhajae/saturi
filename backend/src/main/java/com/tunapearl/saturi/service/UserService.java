@@ -1,7 +1,6 @@
 package com.tunapearl.saturi.service;
 
 import com.tunapearl.saturi.domain.LocationEntity;
-import com.tunapearl.saturi.domain.Token;
 import com.tunapearl.saturi.domain.user.*;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.DuplicatedUserEmailException;
