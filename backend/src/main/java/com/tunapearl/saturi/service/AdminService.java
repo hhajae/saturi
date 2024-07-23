@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 
 @Slf4j
 @Service
-@Transactional(readOnly = true)
+@Transactional
 @RequiredArgsConstructor
 public class AdminService {
 
