@@ -1,5 +1,11 @@
 package com.tunapearl.saturi.service;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.tunapearl.saturi.domain.user.AgeRange;
+import com.tunapearl.saturi.domain.user.Gender;
+import com.tunapearl.saturi.dto.user.social.KakaoUserResponse;
 import com.tunapearl.saturi.dto.user.social.SocialAuthResponse;
 import com.tunapearl.saturi.dto.user.social.SocialUserResponse;
 import com.tunapearl.saturi.dto.user.UserType;
@@ -15,16 +21,22 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class KakaoLoginServiceImpl implements LoginService {
-    private final RestTemplate restTemplate;
-    private MultiValueMap<String, String> body;
+public class KakaoLoginServiceImpl implements SocialLoginService {
 
-    @Value("${social.client.kakao.grant-type}")
+    // 스프링부트 빈 DI
+    private final RestTemplate restTemplate;
+    private final Map<String, AgeRange> ageMap;
+
+    // 내가 생성
+    private MultiValueMap<String, String> body;
+    
+    // yml 설정 파일에서 주입
+    @Value("${social.client.kakao.grant-type-read}")
     private String grantType;
     @Value("${social.client.kakao.client-id}")
     private String clientId;
@@ -110,14 +122,52 @@ public class KakaoLoginServiceImpl implements LoginService {
     }
 
     @Override
+    public void refreshAccessToken(String refreshToken) {
+
+    }
+
+    @Override
     public SocialUserResponse getUserInfo(String accessToken) {
-        String url = "\thttps://kapi.kakao.com/v2/user/me";
+
+        //쿼리 파라미터 & URI 셋팅
+        String url = "https://kapi.kakao.com/v2/user/me";
 
         //헤더 셋팅
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        return null;
+        //요청 보내기
+        HttpEntity<String> requestEntity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                requestEntity,
+                String.class
+        );
+        log.info("Kakao user response: {}", response.getBody());
+
+        //Json 파싱
+        String jsonString = response.getBody();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
+
+        //파싱한 Json으로 유저정보 뽑아내기
+        KakaoUserResponse kakaoUserResponse = gson.fromJson(jsonString, KakaoUserResponse.class);
+        KakaoUserResponse.KakaoUserData kakaoUserData =
+                Optional.ofNullable(kakaoUserResponse.getKakao_account())
+                        .orElse(KakaoUserResponse.KakaoUserData.builder().build());
+
+
+        //유저정보를 DTO에 감싸서 반환
+        Gender gender = (kakaoUserData.getGender().equals("FEMALE"))?(Gender.FEMALE):(Gender.MALE);
+        return SocialUserResponse.builder()
+                .nickname(kakaoUserData.getProfile().getNickname())
+                .email(kakaoUserData.getEmail())
+                .gender(gender)
+                .ageRange(ageMap.get(kakaoUserData.getAgeRange()))
+                .build();
     }
 }
