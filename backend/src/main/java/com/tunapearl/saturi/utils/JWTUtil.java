@@ -37,8 +37,9 @@ public class JWTUtil {
         return create(userId, "refresh-token", refreshTokenExpireTime);
     }
 
-
-    //Long id로 받아서 email을 가져오고 email로 token생성
+    /**
+     *Token 생성
+     */
     private String create(Long userId, String subject, long expireTime) {
 
         Claims claims = Jwts.claims()
@@ -48,9 +49,6 @@ public class JWTUtil {
 
 //		저장할 data의 key, value
         claims.put("userId", userId);
-        //TODO: user_id의 email 가져올것
-
-//        claims.put("email",)
 
         String jwt = Jwts.builder()
                 .setHeaderParam("typ", "JWT")//Header 설정 : 토큰의 타입, 해쉬 알고리즘 정보 세팅.

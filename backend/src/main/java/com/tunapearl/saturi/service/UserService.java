@@ -121,11 +121,7 @@ public class UserService {
         validateDeletedUser(findUser); // 탈퇴회원 검증
         validateBannedUser(findUser); // 정지회원 검증
 
-        String accessToken = jwtUtil.createAccessToken(findUser.getUserId());
-        String refreshToken = jwtUtil.createRefreshToken(findUser.getUserId());
-        tokenService.saveRefreshToken(new Token(findUser.getUserId(),refreshToken));
-
-        return new UserLoginResponseDTO(accessToken, refreshToken);
+        return tokenService.saveRefreshToken(findUser.getUserId());
     }
 
     private static void validateBannedUser(UserEntity findUser) {
