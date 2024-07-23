@@ -29,15 +29,6 @@ public class UserController {
     private final JWTUtil jwtUtil;
     private final TokenService tokenService;
 
-    @GetMapping("/test")
-    public ResponseEntity<UserLoginResponseDTO> test(@RequestBody UserLoginRequestDTO request){
-//        Long userId=12345678L;
-        return ResponseEntity.ok().body(userService.loginUser(request));
-
-//        log.info("getRefreshToken:{}",tokenService.getRefreshToken(userId));
-//        tokenService.deleteRefreshToken(userId);
-    }
-
 
     /**
      * 일반회원 회원가입
@@ -141,13 +132,11 @@ public class UserController {
         return ResponseEntity.ok().body(userService.deleteUser(userId));
     }
 
-
     /**
      * 이메일 인증 메일 전송
      */
     @PostMapping("/auth/email-valid")
     public ResponseEntity<String> emailSend(@RequestBody @Valid EmailRequestDTO request) {
-        //FIXME exception 수정 필요, 반환 타입 수정 필요
         log.info("Received normal user email send request for {}", request.getEmail());
         try {
             return ResponseEntity.ok().body(userService.setEmailSend(request.getEmail()));
@@ -161,7 +150,6 @@ public class UserController {
      */
     @PostMapping("/auth/email-valid-code")
     public ResponseEntity<String> emailAuthCheck(@RequestBody @Valid EmailCheckDTO request) {
-        //FIXME exception 수정 필요, 반환 타입 수정 필요
         log.info("Received normal user email auth check request for {}", request.getEmail());
         if (userService.checkAuthNum(request.getEmail(), request.getAuthNum())) {
             return ResponseEntity.ok().body("ok");
