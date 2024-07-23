@@ -132,13 +132,11 @@ public class UserController {
         return ResponseEntity.ok().body(userService.deleteUser(userId));
     }
 
-
     /**
      * 이메일 인증 메일 전송
      */
     @PostMapping("/auth/email-valid")
     public ResponseEntity<String> emailSend(@RequestBody @Valid EmailRequestDTO request) {
-        //FIXME exception 수정 필요, 반환 타입 수정 필요
         log.info("Received normal user email send request for {}", request.getEmail());
         try {
             return ResponseEntity.ok().body(userService.setEmailSend(request.getEmail()));

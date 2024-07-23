@@ -113,6 +113,7 @@ public class UserService {
      * 일반회원 로그인
      */
     public UserLoginResponseDTO loginUser(UserLoginRequestDTO request) {
+        validatePasswordIsNullOrEmpty(request);
         List<UserEntity> findUsers = userRepository.findByEmailAndPassword(request.getEmail(),
                 PasswordEncoder.encrypt(request.getEmail(), request.getPassword())).get();
         validateAuthenticateUser(findUsers); // 아이디, 비밀번호 일치 여부 검증
@@ -123,13 +124,18 @@ public class UserService {
         return tokenService.saveRefreshToken(findUser.getUserId());
     }
 
+    private static void validatePasswordIsNullOrEmpty(UserLoginRequestDTO request) {
+        if(request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("비밀번호를 제대로 입력하거나 다른 방법으로 로그인하세요");
+        }
+    }
+
     private static void validateBannedUser(UserEntity findUser) {
         if(findUser.getRole() == Role.BANNED) {
             if(LocalDateTime.now().isBefore(findUser.getReturnDt())) {
-                throw new IllegalStateException("계정이 정지되었습니다. [복귀 시각 : " + findUser.getReturnDt() + " ]");
+                throw new IllegalStateException("계정이 정지되었습니다. [계정 복귀 일시 : " + findUser.getReturnDt() + " ]");
             }
-            // 밴 상태인데 복귀 날짜가 지났으면 다시 역할 돌리기
-            findUser.setRole(Role.BASIC);
+            findUser.setRole(Role.BASIC); // 밴 상태인데 복귀 날짜가 지났으면 다시 역할 돌리기
         }
     }
 
