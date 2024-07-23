@@ -1,0 +1,54 @@
+.select {
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+    text-align: center;
+    height: auto;
+    min-height: 100%;
+    font-size: 2rem;
+}
+
+.first-button {
+    display: flex;
+    justify-content: right;
+}
+
+.selectbutton {
+    display: flex;
+    justify-content: space-between;
+}
+
+.button {
+    background-color:#99de83;
+    color: white;
+    font-weight: bold;
+    margin-top: 5px;
+}
+
+.content {
+    margin-left: 20px;
+}
+
+.box {
+    display: grid;
+    background-color: white;
+    border-radius: 15px;
+    height: 330px;
+    width: 600px;
+    margin-top: 15px;
+}
+
+.final {
+    display: flex;
+    text-align: center;
+    justify-content: center;
+  }
+
+.last-button {
+    display: flex;
+    justify-content: center;
+    background-color:#99de83;
+    color: white;
+    font-weight: bold;
+    margin-top: 20px;
+}

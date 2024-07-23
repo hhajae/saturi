@@ -4,7 +4,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button, Accordion, AccordionItem } from "@nextui-org/react";
 import "./styles.css";
-import { color } from "framer-motion";
 
 export default function Start() {
   const Content1 =
