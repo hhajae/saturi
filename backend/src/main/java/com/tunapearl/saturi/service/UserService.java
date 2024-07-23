@@ -213,7 +213,7 @@ public class UserService {
     /**
      * 이메일 인증
      */
-    public int makeRandomNumber() {
+    public String makeRandomAuthCode() {
         Random r1 = new Random();
         Random r2 = new Random();
         StringBuilder randomNumber = new StringBuilder();
@@ -221,7 +221,7 @@ public class UserService {
             if(r1.nextBoolean()) randomNumber.append(Integer.toString(r2.nextInt(10)));
             else randomNumber.append((char)(r2.nextInt(26) + 97));
         }
-        return Integer.parseInt(randomNumber.toString());
+        return randomNumber.toString();
     }
 
     public boolean checkAuthNum(String email, String authNum) {
@@ -231,21 +231,21 @@ public class UserService {
     }
 
     public String setEmailSend(String email) throws MessagingException {
-        int authNumber = makeRandomNumber();
+        String authCode = makeRandomAuthCode();
         String setFromEmail = "gkwo7108@gmail.com";
         //FIXME 인증 보내는 내용 수정 필요(디자인)
         String title = "사투리는 서툴러유 인증번호";
         String content =
                 "사투리는 서툴러유를 방문해주셔서 감사합니다😊" +
                         "<br><br>" +
-                        "인증 번호는 [ " + authNumber + " ] 입니다." +
+                        "인증 번호는 [ " + authCode + " ] 입니다." +
                         "<br>" +
                         "인증번호를 홈페이지에서 입력해주세요";
-        emailSend(setFromEmail, email, title, content, authNumber);
-        return Integer.toString(authNumber);
+        emailSend(setFromEmail, email, title, content, authCode);
+        return authCode;
     }
 
-    public void emailSend(String setFromEmail, String setToEmail, String title, String content, int authNumber) throws MessagingException {
+    public void emailSend(String setFromEmail, String setToEmail, String title, String content, String authCode) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "utf-8");
@@ -257,7 +257,7 @@ public class UserService {
         } catch (MessagingException e) {
             log.error("email send error", e);
         }
-        redisUtil.setDataExpire(Integer.toString(authNumber), setToEmail, 60 * 5L); // redis에 인증번호 저장("123456" : "email@email")
+        redisUtil.setDataExpire(authCode, setToEmail, 60 * 5L); // redis에 인증번호 저장("1a2a3a" : "email@email")
 
     }
 
