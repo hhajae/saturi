@@ -150,7 +150,6 @@ public class UserController {
      */
     @PostMapping("/auth/email-valid-code")
     public ResponseEntity<String> emailAuthCheck(@RequestBody @Valid EmailCheckDTO request) {
-        //FIXME exception 수정 필요, 반환 타입 수정 필요
         log.info("Received normal user email auth check request for {}", request.getEmail());
         if (userService.checkAuthNum(request.getEmail(), request.getAuthNum())) {
             return ResponseEntity.ok().body("ok");

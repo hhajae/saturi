@@ -68,15 +68,15 @@ public class UserService {
         return new UserMsgResponseDTO("유저 회원가입 성공");
     }
 
-    private static void validatePassword(String password) {
-        if(!Pattern.matches(PASSWORD_PATTERN, password)) {
-            throw new IllegalArgumentException("유효하지 않은 비밀번호 형식입니다");
-        }
-    }
-
     private static void validateEmail(String email) {
         if(!Pattern.matches(EMAIL_PATTERN, email)) {
             throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다");
+        }
+    }
+
+    private static void validatePassword(String password) {
+        if(!Pattern.matches(PASSWORD_PATTERN, password)) {
+            throw new IllegalArgumentException("유효하지 않은 비밀번호 형식입니다");
         }
     }
 
@@ -118,7 +118,7 @@ public class UserService {
                 PasswordEncoder.encrypt(request.getEmail(), request.getPassword())).get();
         validateAuthenticateUser(findUsers); // 아이디, 비밀번호 일치 여부 검증
         UserEntity findUser = findUsers.get(0);
-        validateDeletedUser(findUser); // 탈퇴회원 검증
+//        validateDeletedUser(findUser); // 탈퇴회원 검증
         validateBannedUser(findUser); // 정지회원 검증
 
         return tokenService.saveRefreshToken(findUser.getUserId());
@@ -130,22 +130,23 @@ public class UserService {
         }
     }
 
+    private static void validateAuthenticateUser(List<UserEntity> findUsers) {
+        if (findUsers.isEmpty()) {
+            throw new IllegalStateException("아이디 혹은 비밀번호가 일치하지 않습니다.");
+        }
+    }
+
+    // 탈퇴하면 이메일도 지우도록 했으므로 아래 메서드는 사용하지 않음
+//    private static void validateDeletedUser(UserEntity user) {
+//        if (user.getIsDeleted()) throw new IllegalStateException("탈퇴된 회원입니다.");
+//    }
+
     private static void validateBannedUser(UserEntity findUser) {
         if(findUser.getRole() == Role.BANNED) {
             if(LocalDateTime.now().isBefore(findUser.getReturnDt())) {
                 throw new IllegalStateException("계정이 정지되었습니다. [계정 복귀 일시 : " + findUser.getReturnDt() + " ]");
             }
             findUser.setRole(Role.BASIC); // 밴 상태인데 복귀 날짜가 지났으면 다시 역할 돌리기
-        }
-    }
-
-    private static void validateDeletedUser(UserEntity user) {
-        if (user.getIsDeleted()) throw new IllegalStateException("탈퇴된 회원입니다.");
-    }
-
-    private static void validateAuthenticateUser(List<UserEntity> findUsers) {
-        if (findUsers.isEmpty()) {
-            throw new IllegalStateException("아이디 혹은 비밀번호가 일치하지 않습니다.");
         }
     }
 
@@ -275,6 +276,6 @@ public class UserService {
     public UserInfoResponseDTO getUserProfile(Long userId) {
         UserEntity findUser = userRepository.findByUserId(userId).get();
         return new UserInfoResponseDTO(findUser.getUserId(), findUser.getEmail(), findUser.getNickname(), findUser.getRegDate(),
-                findUser.getExp(), findUser.getGender(), findUser.getRole(), findUser.getAgeRange(), findUser.getQuokka());
+                findUser.getExp(), findUser.getGender(), findUser.getRole(), findUser.getAgeRange(), findUser.getLocation().getName(), findUser.getQuokka());
     }
 }
