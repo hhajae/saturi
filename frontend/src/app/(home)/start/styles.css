@@ -5,15 +5,14 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    /* background-image: url('/background.jpg'); */
     background-size: cover;
     background-position: center;
     color: #fff;
-    max-width: 1200px; /* Adjust width as needed */
+    max-width: 1200px;
     width: 100%;
-    padding: 0 20px; /* Add padding to avoid content touching edges */
-    box-sizing: border-box; /* Include padding in the width calculation */
-    margin: 0 auto; /* Center the container */
+    padding: 0 20px;
+    box-sizing: border-box;
+    margin: 0 auto;
   }
 
   .logo2 {
@@ -116,48 +115,19 @@
     flex-direction: column;
     align-items: center; /* Center align the items within the container */
     color: black;
+    font-weight: bold;
   }
 
   .faq h2 {
-    font-size: 3rem;
+    font-size: 2.5rem;
     margin-bottom: 20px;
     text-align: center;
   }
 
   .faq-item {
-    background-color: #e4d0a2;
-    border-radius: 5px;
+    background-color: #fff;
+    border-radius: 15px;
     margin-bottom: 10px;
     padding: 10px 20px;
     width: 100%; /* Make the FAQ items take full width of the container */
-  }
-
-  .faq-question {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: pointer;
-    padding: 10px 0;
-    font-size: 1.5rem;
-  }
-
-  .faq-question h3 {
-    margin: 0;
-    font-size: 1.5rem;
-  }
-
-  .faq-answer {
-    display: none;
-    padding: 10px 0;
-  }
-
-  .faq-answer p {
-    margin: 0;
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
-
-  /* Show answer when item is active */
-  .faq-item.active .faq-answer {
-    display: block;
   }
