@@ -56,16 +56,16 @@ public class SocialUserService {
 
         // 기존재 하던 계정인지 검사
         Optional<List<UserEntity>> user = userRepository.findByEmail(userResponse.getEmail());
-        
-        // 없던 계정이면 회원가입
-        if(user.isEmpty()){
-            UserEntity userEntity = createNewUser(userResponse);
-            userRepository.saveUser(userEntity);
-            user = Optional.of(List.of(userEntity));
+        Long userId;
+        if(user.isEmpty()) {
+            userId = userRepository.saveUser(createNewUser(userResponse));
+        }
+        else{
+            userId = user.get().get(0).getUserId();
         }
 
         //TODO: 회원 엔티티로 JWT 생성
-        //user.get().get(0);
+        log.info("User Entity: {}", userId);
 
         // TODO: 생성된 JWT 토큰 반환
         return UserLoginResponseDTO.builder().build();
