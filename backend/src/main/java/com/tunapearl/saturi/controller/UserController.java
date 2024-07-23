@@ -1,7 +1,6 @@
 package com.tunapearl.saturi.controller;
 
 
-import com.tunapearl.saturi.domain.*;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.*;
 import com.tunapearl.saturi.service.*;
@@ -29,6 +28,16 @@ public class UserController {
     private final SocialUserService socialUserService;
     private final JWTUtil jwtUtil;
     private final TokenService tokenService;
+
+    @GetMapping("/test")
+    public ResponseEntity<UserLoginResponseDTO> test(@RequestBody UserLoginRequestDTO request){
+//        Long userId=12345678L;
+        return ResponseEntity.ok().body(userService.loginUser(request));
+
+//        log.info("getRefreshToken:{}",tokenService.getRefreshToken(userId));
+//        tokenService.deleteRefreshToken(userId);
+    }
+
 
     /**
      * 일반회원 회원가입
@@ -72,6 +81,7 @@ public class UserController {
             log.info("Received social login request for {}", request.getCode());
             return ResponseEntity.created(URI.create("/auth/login")).body(socialUserService.doSocialLogin(request));
         }
+
     }
 
     /**
