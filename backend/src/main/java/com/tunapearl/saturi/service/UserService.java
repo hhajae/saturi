@@ -95,12 +95,23 @@ public class UserService {
         validateAuthenticateUser(findUsers); // 아이디, 비밀번호 일치 여부 검증
         UserEntity findUser = findUsers.get(0);
         validateDeletedUser(findUser); // 탈퇴회원 검증
+        validateBannedUser(findUser); // 정지회원 검증
 
         String accessToken = jwtUtil.createAccessToken(findUser.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(findUser.getUserId());
         tokenService.saveRefreshToken(new Token(findUser.getUserId(),refreshToken));
 
         return new UserLoginResponseDTO(accessToken, refreshToken);
+    }
+
+    private static void validateBannedUser(UserEntity findUser) {
+        if(findUser.getRole() == Role.BANNED) {
+            if(LocalDateTime.now().isBefore(findUser.getReturnDt())) {
+                throw new IllegalStateException("계정이 정지되었습니다. [복귀 시각 : " + findUser.getReturnDt() + " ]");
+            }
+            // 밴 상태인데 복귀 날짜가 지났으면 다시 역할 돌리기
+            findUser.setRole(Role.BASIC);
+        }
     }
 
     private static void validateDeletedUser(UserEntity user) {
@@ -116,6 +127,7 @@ public class UserService {
     /**
      * 로그아웃
      */
+    @Transactional
     public UserMsgResponseDTO logoutUser(String token) throws UnAuthorizedException, Exception {
 
         tokenService.deleteRefreshToken(jwtUtil.getUserId(token));
@@ -237,6 +249,4 @@ public class UserService {
         return new UserInfoResponseDTO(findUser.getUserId(), findUser.getEmail(), findUser.getNickname(), findUser.getRegDate(),
                 findUser.getExp(), findUser.getGender(), findUser.getRole(), findUser.getAgeRange(), findUser.getQuokka());
     }
-
-
 }
