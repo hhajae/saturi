@@ -1,6 +1,6 @@
-import { useRouter } from "next/navigation";
-import { Card, CardBody } from "@nextui-org/react";
 import Image from "next/image";
+import PuzzlePiece from "./puzzlePiece";
+import { Progress } from "@nextui-org/react";
 
 interface PuzzleProps {
   id: string;
@@ -15,24 +15,28 @@ interface PuzzleProps {
 export default function Puzzle({ id, onSelect }: PuzzleProps) {
   // const pieces = await getPuzzle(id);
   const pieces = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  const router = useRouter();
   const onClick = (piece: number) => {
     onSelect(piece); // 선택된 퍼즐 조각을 부모에게 전달
   };
 
   return (
-    <div grid->
-      <div className="grid grid-cols-3 gap-4 w-full">
+    <div>
+      <Progress
+        aria-label="progress bar"
+        value={60}
+        size="lg"
+        className="max-w-md pb-4 m-auto"
+      />
+      <div className="grid grid-cols-3 gap-4">
         {pieces.map(piece => (
-          <Card
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+          <div
             key={piece}
-            className="flex border border-gray-500 p-4 cursor-pointer"
+            className="border rounded-lg cursor-pointer p-0"
             onClick={() => onClick(piece)}
           >
-            <CardBody>
-              <p className="text-center m-24 text-2xl">{piece}</p>
-            </CardBody>
-          </Card>
+            <PuzzlePiece id={piece} />
+          </div>
         ))}
       </div>
     </div>

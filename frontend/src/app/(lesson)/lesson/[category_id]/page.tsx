@@ -20,15 +20,19 @@ export default function CategoryPage() {
   }, [pathname]);
 
   return (
-    <div className="flex h-full">
-      <div className="w-1/5 bg-gray-100 p-4">
-        <SideNavbar />
-      </div>
-      <div className="flex-grow flex flex-col items-center justify-center p-4">
-        {categoryId && <Puzzle id={categoryId} onSelect={setSelectedPuzzle} />}
-      </div>
-      <div className="w-1/5 bg-gray-100 p-4">
-        {selectedPuzzle !== null && <PuzzleInfo id={selectedPuzzle} />}
+    <div className="flex flex-col h-screen justify-center items-center">
+      <div className="flex w-full max-w-screen-lg h-5/6 items-center">
+        <div className="w-1/5 bg-gray-100 p-4">
+          <SideNavbar />
+        </div>
+        <div className="flex-grow flex flex-col items-center justify-center p-4 ">
+          {categoryId && (
+            <Puzzle id={categoryId} onSelect={setSelectedPuzzle} />
+          )}
+        </div>
+        <div className="w-1/5 p-4 flex items-center">
+          {selectedPuzzle !== null && <PuzzleInfo id={selectedPuzzle} />}
+        </div>
       </div>
     </div>
   );

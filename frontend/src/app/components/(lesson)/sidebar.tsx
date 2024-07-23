@@ -1,5 +1,4 @@
-import { CheckboxGroup, Checkbox } from "@nextui-org/react";
-import { useState } from "react";
+import Link from "next/link";
 
 export default function SideNavbar() {
   const categories = [
@@ -10,42 +9,22 @@ export default function SideNavbar() {
     { name: "shopping", icon: "🛒" },
     { name: "electric", icon: "💻" },
   ];
-  const [selected, setSelected] = useState([]);
 
   return (
     <div>
-      <CheckboxGroup
-        label="원하는 주제를 고르세요"
-        className="border border-black justify-center"
-        value={selected}
-        onValueChange={setSelected}
-      >
-        <Checkbox value={categories[0].name}>
-          {categories[0].name}
-          {categories[0].icon}
-        </Checkbox>
-        <Checkbox value={categories[1].name}>
-          {categories[1].name}
-          {categories[1].icon}
-        </Checkbox>
-        <Checkbox value={categories[2].name}>
-          {categories[2].name}
-          {categories[2].icon}
-        </Checkbox>
-        <Checkbox value={categories[3].name}>
-          {categories[3].name}
-          {categories[3].icon}
-        </Checkbox>
-        <Checkbox value={categories[4].name}>
-          {categories[4].name}
-          {categories[4].icon}
-        </Checkbox>
-        <Checkbox value={categories[5].name}>
-          {categories[5].name}
-          {categories[5].icon}
-        </Checkbox>
-      </CheckboxGroup>
-      <p>현재 카테고리 :{selected.join(",")}</p>
+      <h1 className="text-2xl font-bold mb-4">Sidebar</h1>
+      <ol className="space-y-4">
+        {categories.map(subject => (
+          <li key={subject.name}>
+            <p className="flex items-center space-x-2 border border-gray-200 rounded-lg">
+              <span>{subject.icon}</span>
+              <Link href={`/lesson/${subject.name}`} className="text-lg">
+                {subject.name}
+              </Link>
+            </p>
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
