@@ -19,6 +19,6 @@ public class LocationEntity {
 
     private String name;
 
-    @OneToMany(mappedBy = "location")
-    private List<UserEntity> users = new ArrayList<>();
+//    @OneToMany(mappedBy = "location")
+//    private List<UserEntity> users = new ArrayList<>();
 }

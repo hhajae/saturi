@@ -1,11 +1,13 @@
 package com.tunapearl.saturi.service;
 
+import com.tunapearl.saturi.domain.LocationEntity;
 import com.tunapearl.saturi.domain.Token;
 import com.tunapearl.saturi.domain.user.*;
 import com.tunapearl.saturi.dto.user.*;
 import com.tunapearl.saturi.exception.DuplicatedUserEmailException;
 import com.tunapearl.saturi.exception.DuplicatedUserNicknameException;
 import com.tunapearl.saturi.exception.UnAuthorizedException;
+import com.tunapearl.saturi.repository.LocationRepository;
 import com.tunapearl.saturi.repository.UserRepository;
 import com.tunapearl.saturi.utils.JWTUtil;
 import com.tunapearl.saturi.utils.PasswordEncoder;
@@ -23,6 +25,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
@@ -35,6 +38,14 @@ public class UserService {
     private final RedisUtil redisUtil;
     private final JWTUtil jwtUtil;
     private final TokenService tokenService;
+    private final LocationRepository locationRepository;
+    /**
+     * 정규표현식
+     */
+    // 이메일 정규표현식(aaa@a~)
+    private static final String EMAIL_PATTERN = "^[A-Za-z0-9]+@(.+)$";
+    // 비밀번호 정규표현식(8자 이상, 숫자 1, 특수문자(!@#$%^&+=) 1 포함)
+    private static final String PASSWORD_PATTERN = "^(?=.*[0-9])(?=.*[a-z])(?=.*[!@#$%^&+=])(?=\\S+$).{8,}$";
 
     public List<UserEntity> findUsers() {
         return userRepository.findAll().get();
@@ -49,11 +60,25 @@ public class UserService {
      */
     @Transactional
     public UserMsgResponseDTO registerUser(UserRegisterRequestDTO request) {
+        validateEmail(request.getEmail());
+        validatePassword(request.getPassword());
         validateDuplicateUserEmail(request.getEmail());
         validateDuplicateUserNickname(request.getNickname());
         UserEntity user = createNewUser(request);
         userRepository.saveUser(user);
         return new UserMsgResponseDTO("유저 회원가입 성공");
+    }
+
+    private static void validatePassword(String password) {
+        if(!Pattern.matches(PASSWORD_PATTERN, password)) {
+            throw new IllegalArgumentException("유효하지 않은 비밀번호 형식입니다");
+        }
+    }
+
+    private static void validateEmail(String email) {
+        if(!Pattern.matches(EMAIL_PATTERN, email)) {
+            throw new IllegalArgumentException("유효하지 않은 이메일 형식입니다");
+        }
     }
 
     public void validateDuplicateUserEmail(String email) {
@@ -70,13 +95,13 @@ public class UserService {
         }
     }
 
-    private static UserEntity createNewUser(UserRegisterRequestDTO request) {
+    private UserEntity createNewUser(UserRegisterRequestDTO request) {
         UserEntity user = new UserEntity();
         user.setEmail(request.getEmail());
         user.setPassword(PasswordEncoder.encrypt(request.getEmail(), request.getPassword()));
         user.setNickname(request.getNickname());
-        //TODO location data 추가 후 테스트 시도
-//        user.getLocation().setLocationId(request.getLocationId());
+        LocationEntity location = locationRepository.findById(request.getLocationId()).get();
+        user.setLocation(location);
         user.setGender(request.getGender());
         user.setAgeRange(request.getAgeRange());
         user.setRegDate(LocalDateTime.now());
@@ -194,11 +219,12 @@ public class UserService {
      * 이메일 인증
      */
     public int makeRandomNumber() {
-        //FIXME 인증번호 폼 변경 필요? (ex -> 8z76wq)
-        Random r = new Random();
+        Random r1 = new Random();
+        Random r2 = new Random();
         StringBuilder randomNumber = new StringBuilder();
         for (int i = 0; i < 6; i++) {
-            randomNumber.append(Integer.toString(r.nextInt(10)));
+            if(r1.nextBoolean()) randomNumber.append(Integer.toString(r2.nextInt(10)));
+            else randomNumber.append((char)(r2.nextInt(26) + 97));
         }
         return Integer.parseInt(randomNumber.toString());
     }
