@@ -27,10 +27,15 @@ import java.util.*;
 @Slf4j
 @RequiredArgsConstructor
 public class KakaoLoginServiceImpl implements SocialLoginService {
-    private final RestTemplate restTemplate;
-    private MultiValueMap<String, String> body;
-    private Map<String, AgeRange> ageMap;
 
+    // 스프링부트 빈 DI
+    private final RestTemplate restTemplate;
+    private final Map<String, AgeRange> ageMap;
+
+    // 내가 생성
+    private MultiValueMap<String, String> body;
+    
+    // yml 설정 파일에서 주입
     @Value("${social.client.kakao.grant-type-read}")
     private String grantType;
     @Value("${social.client.kakao.client-id}")
@@ -48,20 +53,6 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
         body.add("client_id", clientId);
         body.add("redirect_uri", redirectUri);
         body.add("client_secret", clientSecret);
-
-        ageMap = new HashMap<>();
-        ageMap.put("1~9", AgeRange.CHILD);
-        ageMap.put("10~14", AgeRange.TEENAGER);
-        ageMap.put("15~19", AgeRange.TEENAGER);
-        ageMap.put("20~29", AgeRange.TWENTEEN);
-        ageMap.put("30~39", AgeRange.THIRTEEN);
-        ageMap.put("40~49", AgeRange.FOURTEEN);
-        ageMap.put("50~59", AgeRange.FOURTEEN);
-        ageMap.put("60~69", AgeRange.SIXTEEN);
-        ageMap.put("70~79", AgeRange.SEVENTEEN);
-        ageMap.put("80~89", AgeRange.EIGHTEEN);
-        ageMap.put("90~", AgeRange.NINETEEN);
-
     }
 
     @Override

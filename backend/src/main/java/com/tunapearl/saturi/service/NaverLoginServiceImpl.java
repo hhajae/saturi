@@ -1,7 +1,9 @@
 package com.tunapearl.saturi.service;
 
 import com.tunapearl.saturi.domain.user.AgeRange;
+import com.tunapearl.saturi.domain.user.Gender;
 import com.tunapearl.saturi.dto.user.UserType;
+import com.tunapearl.saturi.dto.user.social.NaverUserResponse;
 import com.tunapearl.saturi.dto.user.social.SocialAuthResponse;
 import com.tunapearl.saturi.dto.user.social.SocialUserResponse;
 import com.tunapearl.saturi.exception.InvalidTokenException;
@@ -24,9 +26,15 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class NaverLoginServiceImpl implements SocialLoginService {
+    
+    // 스프링부트 빈 DI
     private final RestTemplate restTemplate;
+    private final Map<String, AgeRange> ageRanges;
+    
+    // 내가 생성
     private MultiValueMap<String, String> body;
 
+    // yml 설정 파일 주입
     @Value("${social.client.naver.grant-type-read}")
     private String grantType;
     @Value("${social.client.naver.client-id}")
@@ -70,11 +78,38 @@ public class NaverLoginServiceImpl implements SocialLoginService {
 
     @Override
     public void checkTokenValidity(String accessToken) throws InvalidTokenException, RuntimeException {
-
+        return;
     }
 
     @Override
     public SocialUserResponse getUserInfo(String accessToken) {
-        return null;
+
+        String url = "https://openapi.naver.com/v1/nid/me";
+
+        //헤더 설정
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+
+        //바디 설정(선택)
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        //요청
+        ResponseEntity<NaverUserResponse> response = restTemplate
+                .exchange(url, HttpMethod.GET, entity, NaverUserResponse.class);
+        NaverUserResponse.NaverUserData userData = response.getBody().getNaverUserData();
+
+        //SocialUserResponse로 반환
+        Gender gender;
+        switch (userData.getGender()) {
+            case "F": gender = Gender.FEMALE; break;
+            case "M": gender = Gender.MALE; break;
+            default: gender = null; break;
+        }
+        return SocialUserResponse.builder()
+                .nickname(userData.getNickname())
+                .email(userData.getEmail())
+                .gender(gender)
+                .ageRange(ageRanges.get(userData.getAge().replace('-', '~')))
+                .build();
     }
 }

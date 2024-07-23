@@ -33,10 +33,6 @@ public class SocialUserService {
 
         // 유저 토큰 정보 얻기
         SocialAuthResponse authResponse = loginService.getAccessToken(request.getCode());
-        if(loginService instanceof NaverLoginServiceImpl){
-            log.info("Naver login request Here");
-            return UserLoginResponseDTO.builder().build();
-        }
 
         // 토큰 유효성 검사
         try {
@@ -52,6 +48,12 @@ public class SocialUserService {
 
         // 유저 개인 정보 얻기
         SocialUserResponse userResponse = loginService.getUserInfo(authResponse.getAccessToken());
+        log.info("User Response: {}", userResponse);
+
+        if(loginService instanceof NaverLoginServiceImpl){
+            log.info("Naver login request Here");
+            return UserLoginResponseDTO.builder().build();
+        }
 
         // 기존재 하던 계정인지 검사
         Optional<List<UserEntity>> user = userRepository.findByEmail(userResponse.getEmail());
