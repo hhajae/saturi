@@ -42,7 +42,6 @@ public class NaverLoginServiceImpl implements SocialLoginService {
     private String redirectUri;
     @Value("${social.client.naver.client-secret}")
     private String clientSecret;
-    private String code;
 
     @PostConstruct
     public void init() {

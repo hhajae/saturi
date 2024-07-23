@@ -32,9 +32,6 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
     private final RestTemplate restTemplate;
     private final Map<String, AgeRange> ageMap;
 
-    // 내가 생성
-    private MultiValueMap<String, String> body;
-
     // yml 설정 파일에서 주입
     @Value("${social.client.kakao.grant-type}")
     private String grantType;
@@ -46,16 +43,6 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
     private String redirectUri;
     @Value("${social.client.kakao.client-secret}")
     private String clientSecret;
-    private String code;
-
-    @PostConstruct
-    public void init() {
-        body = new LinkedMultiValueMap<>();
-        body.add("grant_type", grantType);
-        body.add("client_id", clientId);
-        body.add("redirect_uri", redirectUri);
-        body.add("client_secret", clientSecret);
-    }
 
     @Override
     public UserType getServiceName() {
@@ -72,6 +59,11 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
         headers.set("Content-Type", "application/x-www-form-urlencoded");
 
         //바디 셋팅(code 제외 나머지는 고정값)
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
+        body.add("grant_type", grantType);
+        body.add("client_id", clientId);
+        body.add("client_secret", clientSecret);
+        body.add("redirect_uri", redirectUri);
         body.add("code", code);
 
         //요청
@@ -84,7 +76,6 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
         );
         log.info("Kakao Access Token Headers: {}", response.getHeaders());
         log.info("Kakao Access Token Response: {}", response.getBody());
-        body.remove("code");
         return response.getBody();
     }
 
@@ -132,14 +123,14 @@ public class KakaoLoginServiceImpl implements SocialLoginService {
         headers.setContentType(MediaType.valueOf("pplication/x-www-form-urlencoded;charset=utf-8"));
 
         //바디 셋팅
-        MultiValueMap<String, String> refreshBody = new LinkedMultiValueMap<>();
+        MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", grantTypeRefresh);
         body.add("client_id", clientId);
-        body.add("refresh_token", refreshToken);
         body.add("client_secret", clientSecret);
+        body.add("refresh_token", refreshToken);
 
         //요청
-        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(refreshBody, headers);
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(body, headers);
         ResponseEntity<SocialAuthResponse> response = restTemplate.exchange(
                 url,
                 HttpMethod.POST,
