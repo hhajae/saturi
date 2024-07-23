@@ -1,6 +1,5 @@
-import Image from "next/image";
-import PuzzlePiece from "./puzzlePiece";
 import { Progress } from "@nextui-org/react";
+import PuzzlePiece from "./puzzlePiece";
 
 interface PuzzleProps {
   id: string;
