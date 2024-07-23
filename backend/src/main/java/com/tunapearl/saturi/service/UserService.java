@@ -105,10 +105,12 @@ public class UserService {
     }
 
     private static void validateBannedUser(UserEntity findUser) {
-        if(findUser.getIsDeleted()) {
+        if(findUser.getRole() == Role.BANNED) {
             if(LocalDateTime.now().isBefore(findUser.getReturnDt())) {
                 throw new IllegalStateException("계정이 정지되었습니다. [복귀 시각 : " + findUser.getReturnDt() + " ]");
             }
+            // 밴 상태인데 복귀 날짜가 지났으면 다시 역할 돌리기
+            findUser.setRole(Role.BASIC);
         }
     }
 
@@ -125,6 +127,7 @@ public class UserService {
     /**
      * 로그아웃
      */
+    @Transactional
     public UserMsgResponseDTO logoutUser(String token) throws UnAuthorizedException, Exception {
 
         tokenService.deleteRefreshToken(jwtUtil.getUserId(token));
@@ -246,6 +249,4 @@ public class UserService {
         return new UserInfoResponseDTO(findUser.getUserId(), findUser.getEmail(), findUser.getNickname(), findUser.getRegDate(),
                 findUser.getExp(), findUser.getGender(), findUser.getRole(), findUser.getAgeRange(), findUser.getQuokka());
     }
-
-
 }
