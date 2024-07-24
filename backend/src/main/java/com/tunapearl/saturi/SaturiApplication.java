@@ -8,6 +8,8 @@ public class SaturiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SaturiApplication.class, args);
+
+		System.out.println("Hello World!");
 	}
 
 }
