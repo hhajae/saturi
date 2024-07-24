@@ -1,6 +1,10 @@
 import Link from "next/link";
 
-export default function SideNavbar() {
+interface SideNavbarProps {
+  location: string;
+}
+
+export default function SideNavbar({ location }: SideNavbarProps) {
   const categories = [
     { name: "hobby", icon: "🎨" },
     { name: "travel", icon: "✈️" },
@@ -14,12 +18,12 @@ export default function SideNavbar() {
     <div>
       <h1 className="text-2xl font-bold mb-4">Sidebar</h1>
       <ol className="space-y-4">
-        {categories.map(subject => (
-          <li key={subject.name}>
+        {categories.map(category => (
+          <li key={category.name}>
             <p className="flex items-center space-x-2 border border-gray-200 rounded-lg">
-              <span>{subject.icon}</span>
-              <Link href={`/lesson/${subject.name}`} className="text-lg">
-                {subject.name}
+              <span>{category.icon}</span>
+              <Link href={`/lesson/${location}/${category.name}`} className="text-lg">
+                {category.name}
               </Link>
             </p>
           </li>

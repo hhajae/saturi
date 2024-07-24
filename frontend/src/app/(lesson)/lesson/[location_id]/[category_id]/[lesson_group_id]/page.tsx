@@ -3,17 +3,23 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@nextui-org/react";
+import { useRouter, usePathname } from "next/navigation";
+
+
 
 export default function LessonPage() {
   const texts = [
-    "마 니 국밥 무봤나",
-    "마 니 자신있나",
-    "맛이 깔끼하네",
-    "블루베리 스무디",
-    "이거 어디까지 올라가는 거에요?",
+    { id: 1, text: "마 니 국밥 무봤나" },
+    { id: 2, text: "마 니 자신있나" },
+    { id: 3, text: "맛이 깔끼하네" },
+    { id: 4, text: "블루베리 스무디" },
+    { id: 5, text: "이거 어디까지 올라가는 거에요?" },
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRecording, setIsRecording] = useState(false);
+
+  const router = useRouter();
+  const path = usePathname();
 
   const handleNext = () => {
     if (currentIndex < texts.length - 1) {
@@ -23,6 +29,10 @@ export default function LessonPage() {
 
   const handleRecording = () => {
     setIsRecording(!isRecording);
+  };
+
+  const handleResult = () => {
+    router.push(`${path}/result`);
   };
 
   return (
@@ -44,7 +54,7 @@ export default function LessonPage() {
           </h1>
           {texts.map((text, index) => (
             <h1
-              key={index}
+              key={text.id}
               className={`mb-2 ${index === currentIndex ? "text-4xl font-bold text-black" : index > currentIndex ? "text-lg text-gray-300" : "text-xl text-gray-400"}`}
               style={{
                 display:
@@ -53,7 +63,7 @@ export default function LessonPage() {
                     : "none",
               }}
             >
-              {text}
+              {text.text}
             </h1>
           ))}
           <div className="mt-4 flex space-x-2">
@@ -68,7 +78,7 @@ export default function LessonPage() {
               onClick={handleNext}
             >
               건너뛰기
-            </Button>  
+            </Button>
             {currentIndex < texts.length - 1 ? (
               <Button
                 className="bg-green-500 text-white px-4 py-2 rounded"
@@ -79,7 +89,7 @@ export default function LessonPage() {
             ) : (
               <Button
                 className="bg-blue-500 text-white px-4 py-2 rounded"
-                // 결과 보기 버튼 클릭 시의 동작을 정의합니다.
+                onClick={handleResult}
               >
                 결과 보기
               </Button>

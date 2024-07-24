@@ -2,20 +2,20 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import SideNavbar from "../../../components/(lesson)/sidebar";
-import Puzzle from "../../../components/(lesson)/puzzle";
-import PuzzleInfo from "../../../components/(lesson)/puzzleInfo"; // 새로운 컴포넌트 import
+import SideNavbar from "../../../../../components/lesson/sidebar";
+import Puzzle from "../../../../../components/lesson/puzzle";
+import PuzzleInfo from "../../../../../components/lesson/puzzleInfo";
 
-export default function CategoryPage() {
+export default function CategorySelectPage() {
   const pathname = usePathname();
   const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [selectedPuzzle, setSelectedPuzzle] = useState<number | null>(null); // 선택된 퍼즐 조각을 위한 상태
+  const [selectedPuzzle, setSelectedPuzzle] = useState<number | null>(null);
 
   useEffect(() => {
     const pathSegments = pathname.split("/");
-    const category_id = pathSegments[pathSegments.length - 1];
-    if (category_id) {
-      setCategoryId(category_id);
+    const nowCategory = pathSegments[pathSegments.length - 2];
+    if (nowCategory) {
+      setCategoryId(nowCategory);
     }
   }, [pathname]);
 
@@ -23,7 +23,7 @@ export default function CategoryPage() {
     <div className="flex flex-col h-screen justify-center items-center">
       <div className="flex w-full max-w-screen-lg h-5/6 items-center">
         <div className="w-1/5 bg-gray-100 p-4">
-          <SideNavbar />
+          <SideNavbar location={categoryId}/>
         </div>
         <div className="flex-grow flex flex-col items-center justify-center p-4 ">
           {categoryId && (

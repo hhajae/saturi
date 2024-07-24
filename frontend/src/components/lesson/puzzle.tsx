@@ -2,7 +2,7 @@ import { Progress } from "@nextui-org/react";
 import PuzzlePiece from "./puzzlePiece";
 
 interface PuzzleProps {
-  id: string;
+  id: number;
   onSelect: (pieceId: number) => void; // 클릭된 퍼즐 조각을 부모에게 전달하는 함수
 }
 
@@ -34,7 +34,7 @@ export default function Puzzle({ id, onSelect }: PuzzleProps) {
             className="border rounded-lg cursor-pointer p-0"
             onClick={() => onClick(piece)}
           >
-            <PuzzlePiece id={piece} />
+            <PuzzlePiece locationId={id} piece={piece}/>
           </div>
         ))}
       </div>
