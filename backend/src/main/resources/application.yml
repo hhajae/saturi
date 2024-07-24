@@ -1,27 +1,21 @@
-spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/saturi?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
-    username: ssafy
-    password: ssafy
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-  jpa:
-    hibernate:
-      ddl-auto: update # 또는 필요에 따라 create, create-drop, validate로 변경
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
-        show_sql: true
-        format_sql: true
+#spring:
+#  datasource:
+#    url: jdbc:mysql://localhost:3306/saturi?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+#    username: ssafy
+#    password: ssafy
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#
+#  jpa:
+#    hibernate:
+#      ddl-auto: update # 또는 필요에 따라 create, create-drop, validate로 변경
+#    properties:
+#      hibernate:
+#        dialect: org.hibernate.dialect.MySQLDialect
+#        show_sql: true
+#        format_sql: true
 
   # 선택사항: Hibernate 통계 정보 활성화
   # hibernate:
   #   generate_statistics: true
 
 # 로그 설정
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: debug
-        type: trace
