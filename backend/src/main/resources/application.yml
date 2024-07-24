@@ -19,3 +19,9 @@
   #   generate_statistics: true
 
 # 로그 설정
+logging:
+  level:
+    org:
+      hibernate:
+        SQL: debug
+        type: trace
