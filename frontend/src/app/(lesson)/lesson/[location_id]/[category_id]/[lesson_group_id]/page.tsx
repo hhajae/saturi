@@ -47,7 +47,7 @@ export default function LessonPage() {
           className="object-contain"
         />
       </div>
-      <div className="w-2/3 flex flex-col items-center justify-center p-4">
+      <div className="w-2/3 flex flex-col items-center justify-center p-4 h-1/2">
         <div className="bg-gray-200 p-8 rounded shadow w-full h-full flex flex-col items-center justify-center">
           <h1 className="text-3xl font-bold text-black mb-2">
             {currentIndex + 1}/5

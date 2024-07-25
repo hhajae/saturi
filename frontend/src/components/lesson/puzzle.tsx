@@ -2,7 +2,7 @@ import { Progress } from "@nextui-org/react";
 import PuzzlePiece from "./puzzlePiece";
 
 interface PuzzleProps {
-  id: number;
+  id: number | null;
   onSelect: (pieceId: number) => void; // 클릭된 퍼즐 조각을 부모에게 전달하는 함수
 }
 

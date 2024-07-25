@@ -1,12 +1,9 @@
 import { redirect } from "next/navigation";
 
 export default function RedirectPage(id: number) {
-  const locations = ["경상도", "강원도", "경기도", "전라도", "충청도"];
-  redirect(`/lesson/${locations[id]}/hobby`);
-  // return (
-  //   <div>
-  //     <h1>/lesson Page</h1>
-  //     <h2>it will redirect to lesson/hobby</h2>
-  //   </div>
-  // );
+  // 지역 선택 페이지에서 지역 id 를 넘겨 받고 바로 url로 연결시키면 됨
+  // 단순 URL 입력을 통한 연결은 첫번째 지역의 첫번째 주제로 연결되도록 할것
+
+  redirect(`/lesson/1/daily`);
+  // redirect(`lesson/${id}/hobby`)
 }

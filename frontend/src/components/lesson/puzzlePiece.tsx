@@ -9,7 +9,7 @@ import {
 import { useRouter, usePathname } from "next/navigation";
 
 interface IPuzzlePiece {
-  locationId: number;
+  locationId: number | null;
   piece:number;
 }
 
