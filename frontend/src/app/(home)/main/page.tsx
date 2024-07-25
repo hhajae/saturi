@@ -5,6 +5,7 @@ import Image from 'next/image';
 // import { ReactComponent as KoreaMap } from './koreaMap.svg';
 import './style.css';
 import { Button, Popover, PopoverTrigger, PopoverContent } from '@nextui-org/react';
+import KoreaMap from './koreaMap';
 
 
 ///////////////////////
@@ -203,13 +204,15 @@ function ButtonPart({ onLeftClick, onRightClick, middleToWhere }) {
 function MiddleMap({ left }) {
   return (
     <div className="middleMap" style={{ left: left === "null" ? null : left }}>
-      <Image
+      {/* <Image
         src="/MainPage/map_of_korea.png"
         alt="koreamap"
         width={500}
         height={500}
-      />
-      {/* <KoreaMap /> */}
+      /> */}
+      <div style={{ width: '50%', height: '50%' }}>
+        <KoreaMap />
+      </div>
     </div>
   );
 }
