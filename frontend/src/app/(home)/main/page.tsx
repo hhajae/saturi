@@ -224,6 +224,13 @@ export default function App() {
   let moveDirection = useRef("null");
   const [mainPageIndicator, setMainPageIndicator] = useState(0);
   const currentMainPageRef = useRef(1);
+  const [selectedRegion, setSelectedRegion] = useState("None");
+
+  // 지역 선택
+  const handleRegionSelect = (region) => {
+    setSelectedRegion(region);
+  };
+
 
   const handleProfileClick = (e) => {
     e.preventDefault();
@@ -262,6 +269,8 @@ export default function App() {
     }
   };
 
+
+
   return (
     <div>       
       <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
@@ -270,7 +279,7 @@ export default function App() {
         <MiddlePart middlePosition = {middleToWhere} mainPageIndicator = {mainPageIndicator} />
         <RightPart />
         <ButtonPart onLeftClick={handleLeftClick} onRightClick={handleRightClick} middleToWhere = {middleToWhere} />
-        <MiddleMap left={mapLeft}/>
+        <MiddleMap left={mapLeft} onRegionSelect={handleRegionSelect}/>
       </div>
     </div>
   );

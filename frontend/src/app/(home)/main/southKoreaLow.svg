@@ -11,6 +11,7 @@
 		<amcharts:ammap  projection="mercator" leftLongitude="125.385069" topLatitude="38.611881" rightLongitude="131.873029" bottomLatitude="33.194810">
 		</amcharts:ammap>
 </defs>
+
 <g>
 	<g>
 		<polygon fill="#CCCCCC" stroke="#FFFFFF" stroke-width="0.5" points="118.187,309.904 115.408,307.013 114.648,306.882 
