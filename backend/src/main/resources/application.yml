@@ -70,4 +70,3 @@ social:
       client_id: BUvsmsuF11bb6Ac_YdEh
       redirect-uri: http://localhost:3000/user/auth/login/naver
       client_secret: agzrMxlQfB
-
