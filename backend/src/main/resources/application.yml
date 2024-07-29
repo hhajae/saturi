@@ -55,3 +55,19 @@ logging:
       hibernate:
         SQL: debug
         type: trace
+
+social:
+  client:
+    kakao:
+      grant-type: authorization_code
+      grant-type-refresh: refresh_token
+      client-id: ce44932597263b3c038f3e226f3c3328
+      redirect-uri: http://localhost:3000/user/auth/login/kakao
+      client-secret: VGCitmfgTmn+t2ou+zVxu6OA7TYNSAApWRexee/pjXA=
+    naver:
+      grant-type: authorization_code
+      grant-type-refresh: refresh_token
+      client_id: BUvsmsuF11bb6Ac_YdEh
+      redirect-uri: http://localhost:3000/user/auth/login/naver
+      client_secret: agzrMxlQfB
+
