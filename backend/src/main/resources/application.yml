@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/saturi?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8
+    url: jdbc:mysql://localhost:3306/saturi?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: ssafy
     password: ssafy
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -37,11 +37,9 @@ spring:
   jwt:
     salt: "ssafy-screte-key-20240719-ssafy-screte-key-20240719-ssafy-screte-key-20240719"
     access-token:
-      expiretime: 3600000
-      # expiretime: 20000
+      expiretime: 3600
     refresh-token:
-      expiretime: 2592000000
-      # expiretime: 40000
+      expiretime: 604800
 
   data:
     redis:
@@ -55,3 +53,18 @@ logging:
       hibernate:
         SQL: debug
         type: trace
+
+social:
+  client:
+    kakao:
+      grant-type: authorization_code
+      grant-type-refresh: refresh_token
+      client-id: ce44932597263b3c038f3e226f3c3328
+      redirect-uri: http://localhost:3000/user/auth/login/kakao
+      client-secret: VGCitmfgTmn+t2ou+zVxu6OA7TYNSAApWRexee/pjXA=
+    naver:
+      grant-type: authorization_code
+      grant-type-refresh: refresh_token
+      client_id: BUvsmsuF11bb6Ac_YdEh
+      redirect-uri: http://localhost:3000/user/auth/login/naver
+      client_secret: agzrMxlQfB
