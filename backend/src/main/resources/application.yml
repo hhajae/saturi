@@ -73,4 +73,4 @@ social:
       client_secret: agzrMxlQfB
 
 file:
-  dir: C:\SSAFY\filetest\
+  dir: /home/ubuntu/saturi_vice_files/
