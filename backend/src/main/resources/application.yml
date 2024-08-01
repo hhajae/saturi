@@ -4,8 +4,8 @@ spring:
       path: /saturi-api
   datasource:
     url: jdbc:mysql://mysql-saturi:3306/saturi?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
-    username: ssafy
-    password: ssafy
+    username: root
+    password: eksth3ro
     driver-class-name: com.mysql.cj.jdbc.Driver
   mail:
     host: smtp.gmail.com
