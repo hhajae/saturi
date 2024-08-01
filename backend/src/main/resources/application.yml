@@ -4,8 +4,8 @@ spring:
       path: /saturi-api
   datasource:
     url: jdbc:mysql://mysql-saturi:3306/saturi?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
-    username: ssafy
-    password: ssafy
+    username: root
+    password: eksth3ro
     driver-class-name: com.mysql.cj.jdbc.Driver
   mail:
     host: smtp.gmail.com
@@ -32,7 +32,7 @@ spring:
         #        show_sql: true
         format_sql: true
         default_batch_fetch_size: 100 # fetch join 후 지연로딩하는 entity을 in 절로 미리 영속성 컨텍스트에 저장
-
+    defer-datasource-initialization: true # data.sql이 하이버네이트가 초기화 되기 전에 실행되는 것을 방지
   # 선택사항: Hibernate 통계 정보 활성화
   # hibernate:
   #   generate_statistics: true
@@ -49,6 +49,9 @@ spring:
       host: redis-saturi
       port: 6379
 
+  sql:
+    init:
+      mode: always # 실행 시점에 샘플 데이터 넣기(resources 폴더에 sql파일을 넣는다(data.sql)
 # 로그 설정
 logging:
   level:
