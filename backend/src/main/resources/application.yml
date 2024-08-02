@@ -76,4 +76,4 @@ social:
       client_secret: agzrMxlQfB
 
 file:
-  dir: /home/ubuntu/saturi_vice_files/
+  dir: /app/saturi_vice_files/
