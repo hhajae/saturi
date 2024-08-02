@@ -66,13 +66,13 @@ social:
       grant-type: authorization_code
       grant-type-refresh: refresh_token
       client-id: ce44932597263b3c038f3e226f3c3328
-      redirect-uri: http://54.180.136.48/user/auth/login/kakao
+      redirect-uri: http://54.180.136.48/saturi-api/user/auth/login/kakao
       client-secret: VGCitmfgTmn+t2ou+zVxu6OA7TYNSAApWRexee/pjXA=
     naver:
       grant-type: authorization_code
       grant-type-refresh: refresh_token
       client_id: BUvsmsuF11bb6Ac_YdEh
-      redirect-uri: http://54.180.136.48/user/auth/login/naver
+      redirect-uri: http://54.180.136.48/saturi-api/user/auth/login/naver
       client_secret: agzrMxlQfB
 
 file:
