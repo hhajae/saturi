@@ -40,9 +40,9 @@ spring:
   jwt:
     salt: "ssafy-screte-key-20240719-ssafy-screte-key-20240719-ssafy-screte-key-20240719"
     access-token:
-      expiretime: 360000
+      expiretime: 1000*60*60*24 #하루
     refresh-token:
-      expiretime: 60480000
+      expiretime: 1000*60*60*24*365 #1년
 
   data:
     redis:
@@ -66,13 +66,13 @@ social:
       grant-type: authorization_code
       grant-type-refresh: refresh_token
       client-id: ce44932597263b3c038f3e226f3c3328
-      redirect-uri: http://i11d104.p.ssafy.io/user/auth/login/kakao
+      redirect-uri: https://i11d104.p.ssafy.io/user/auth/login/kakao
       client-secret: VGCitmfgTmn+t2ou+zVxu6OA7TYNSAApWRexee/pjXA=
     naver:
       grant-type: authorization_code
       grant-type-refresh: refresh_token
       client_id: BUvsmsuF11bb6Ac_YdEh
-      redirect-uri: http://i11d104.p.ssafy.io/user/auth/login/naver
+      redirect-uri: https://i11d104.p.ssafy.io/user/auth/login/naver
       client_secret: agzrMxlQfB
 
 file:
