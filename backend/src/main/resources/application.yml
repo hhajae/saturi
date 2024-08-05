@@ -40,9 +40,9 @@ spring:
   jwt:
     salt: "ssafy-screte-key-20240719-ssafy-screte-key-20240719-ssafy-screte-key-20240719"
     access-token:
-      expiretime: 360000
+      expiretime: 1000*60*60*24 #하루
     refresh-token:
-      expiretime: 60480000
+      expiretime: 1000*60*60*24*365 #1년
 
   data:
     redis:
