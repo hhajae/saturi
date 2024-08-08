@@ -10,8 +10,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: gkwo7108@gmail.com
-    password: nqubrrxufkoexsgy
+    username: saturi0422@gmail.com
+    password: ysvlokgniqagvzvv
     properties:
       mail:
         smtp:
@@ -32,6 +32,8 @@ spring:
         #        show_sql: true
         format_sql: true
         default_batch_fetch_size: 100 # fetch join 후 지연로딩하는 entity을 in 절로 미리 영속성 컨텍스트에 저장
+        hbm2ddl:
+          import_files_sql_extractor: org.hibernate.tool.schema.internal.script.MultiLineSqlScriptExtractor # import.sql 멀티라인 되게 지원해줌
     defer-datasource-initialization: true # data.sql이 하이버네이트가 초기화 되기 전에 실행되는 것을 방지
   # 선택사항: Hibernate 통계 정보 활성화
   # hibernate:
@@ -51,7 +53,7 @@ spring:
 
   sql:
     init:
-      mode: always # 실행 시점에 샘플 데이터 넣기(resources 폴더에 sql파일을 넣는다(data.sql)
+      mode: always # 실행 시점에 샘플 데이터 넣기(resources 폴더에 sql파일을 넣는다(import.sql)
 # 로그 설정
 logging:
   level:
