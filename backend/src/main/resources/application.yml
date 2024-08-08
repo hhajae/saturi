@@ -25,7 +25,7 @@ spring:
     auth-code-expiration-millis: 1800000
   jpa:
     hibernate:
-      ddl-auto: create # 또는 필요에 따라 create, create-drop, validate로 변경
+      ddl-auto: none # 또는 필요에 따라 create, create-drop, validate로 변경
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
